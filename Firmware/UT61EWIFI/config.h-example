@@ -1,0 +1,20 @@
+/* ----------------- General config -------------------------------- */
+/* WiFi */
+const char* ssid                  = "YOUR SSID";     // Your WiFi SSID
+const char* password              = "YOUR PSK";      // Your WiFi password
+
+/* MQTT */
+const char* mqtt_broker           = "192.168.1.111"; // IP address of your MQTT broker
+const char* mqtt_username         = "";              // Your MQTT username
+const char* mqtt_password         = "";              // Your MQTT password
+#define     REPORT_MQTT_SEPARATE  true               // Report each value to its own topic
+#define     REPORT_MQTT_JSON      true               // Report all values in a JSON message
+const char* status_topic          = "events";        // MQTT topic to report startup
+
+/* Serial */
+#define     SERIAL_BAUD_RATE    115200               // Speed for USB serial console
+
+/* ----------------- Hardware-specific config ---------------------- */
+#define     UT61E_RX_PIN              16             // Rx from UT61e (== UT61e Tx)
+#define     UT61E_TX_PIN              17             // We don't use this because UT61e has no Rx
+#define     UT61E_BAUD_RATE        19200             // UT61e uses 19200,7,O,1
