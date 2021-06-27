@@ -1,3 +1,6 @@
+The schematic for the RS232 adapter is wrong! See here:  
+http://www.designelectronics.com.au/DesignElectronics_UT61E-APO.htm
+
 http://gushh.net/blog/ut61e-protocol/
 
 http://kiedontaa.blogspot.com/2016/02/bluetooth-adapter-for-uni-t-ut61e.html
@@ -15,3 +18,9 @@ while the MCU is turned off so no power bleeds. The MCU needs to
 set the pin to LOW to activate the voltage divider. Idea from:
 
 https://tinker.yeoman.com.au/2015/12/04/esp8266-smart-shelf-part-1/
+
+Comparator to detect rising and falling edge:
+
+https://e2e.ti.com/support/logic-group/logic/f/logic-forum/856131/sn74hc14-schmitt-trigger-to-cleanup-digital-signal
+
+https://www.digikey.com/en/products/detail/texas-instruments/TLV7011DCKT/8604643
