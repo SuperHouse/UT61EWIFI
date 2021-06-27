@@ -213,8 +213,8 @@ void reconnectMqtt() {
     Serial.print(mqtt_client_id);
     Serial.print("... ");
     // Attempt to connect
-    if (client.connect(mqtt_client_id, mqtt_username, mqtt_password)) {
-      //Serial.println("connected");
+    if (client.connect(mqtt_client_id, mqtt_username, mqtt_password))
+    {
       // Once connected, publish an announcement
       sprintf(g_mqtt_message_buffer, "Device %s starting up", mqtt_client_id);
       client.publish(status_topic, g_mqtt_message_buffer);
