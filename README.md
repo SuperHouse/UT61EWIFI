@@ -7,7 +7,7 @@ streams data, including the currently selected range and reading.
 This project is a WiFi adapter that attaches to the output port
 and reports the data via WiFi.
 
-![UT61e WiFi Interface](Images/UT61EWIFI-v1_1-top.jpg)
+![UT61e WiFi Interface](Images/UT61EWIFI-v1_1-top.jpg | width=300)
 
 More details:
 
