@@ -5,9 +5,18 @@ The UNI-T UT61E multimeter has an opto-isolated output port that
 streams data, including the currently selected range and reading.
 
 This project is a WiFi adapter that attaches to the output port
-and reports the data via WiFi.
+and reports the data via WiFi or USB.
 
-![UT61e WiFi Interface](Images/UT61EWIFI-v1_1-top.jpg)
+The example firmware reads the data packet from the multimeter and
+publishes it to an MQTT broker, and also outputs it via the USB
+port at 115200bps. The data packet is not processed or interpreted
+in the current versions of the examples.
+
+![UT61e WiFi Interface](Images/UT61EWIFI-v1_0-oblique-small.jpg)
+
+NOTE: The Rx data pin has been changed from D0 (GPIO16) in the
+v1.0 design to D5 (GPIO14) in v1.1. Photos show a v1.0 PCB that
+has been patched to the new Rx data pin.
 
 More details:
 
