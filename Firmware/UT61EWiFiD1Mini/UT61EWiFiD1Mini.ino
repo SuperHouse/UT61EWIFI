@@ -8,10 +8,11 @@
   broker.
 
   External dependencies. Install using the Arduino library manager:
-     "PubSubClient" by Nick O'Leary
+    - "PubSubClient" by Nick O'Leary
+    - "NeoPixel" by Adafruit
 
 */
-#define VERSION "0.1"
+#define VERSION "1.0"
 
 /*--------------------------- Configuration ------------------------------*/
 // Configuration should be done in the included file:
@@ -21,6 +22,7 @@
 //#include <WiFi.h>                     // ESP32 WiFi driver
 #include <ESP8266WiFi.h>              // ESP8266 WiFi driver
 #include <PubSubClient.h>             // For MQTT
+#include <Adafruit_NeoPixel.h>        // For status LED
 //#include <HardwareSerial.h>           // ESP32 second serial port
 #include <SoftwareSerial.h>           // Must be the EspSoftwareSerial library
 
@@ -50,6 +52,7 @@ WiFiClient esp_client;
 PubSubClient client(esp_client);
 //HardwareSerial ut61e(1);
 SoftwareSerial ut61e(UT61E_RX_PIN, -1); // RX, TX
+Adafruit_NeoPixel pixels(1, STATUS_LED_PIN, NEO_GRB + NEO_KHZ800);
 
 /*--------------------------- Program ---------------------------------------*/
 /**
@@ -57,15 +60,20 @@ SoftwareSerial ut61e(UT61E_RX_PIN, -1); // RX, TX
 */
 void setup()
 {
+  pixels.begin();
+  pixels.clear();
+  pixels.setPixelColor(0, pixels.Color(50, 0, 0));  // Red
+  pixels.show();
+
   Serial.begin(SERIAL_BAUD_RATE);
   Serial.println();
-  Serial.print("UT61e multimeter WiFi interface starting up, v");
+  Serial.print("UT61e multimeter WiFi/USB interface starting up, v");
   Serial.println(VERSION);
 
 
   // Open a connection to the PMS and put it into passive mode
-  //ut61e.begin(UT61E_BAUD_RATE, SERIAL_7O1, UT61E_RX_PIN, -1);  // Connection for PMS5003
-  ut61e.begin(UT61E_BAUD_RATE, SWSERIAL_7O1, UT61E_RX_PIN, -1);  // Connection for PMS5003
+  //ut61e.begin(UT61E_BAUD_RATE, SERIAL_7O1, UT61E_RX_PIN, -1);  // Connection for multimeter
+  ut61e.begin(UT61E_BAUD_RATE, SWSERIAL_7O1, UT61E_RX_PIN, -1);  // Connection for multimeter
 
   // We need a unique device ID for our MQTT client connection
   //uint64_t macAddress = ESP.getEfuseMac();
@@ -78,8 +86,8 @@ void setup()
   // Set up the topics for publishing sensor readings. By inserting the unique ID,
   // the result is of the form: "device/d9616f/PM1P0" etc
   sprintf(g_command_topic,        "cmnd/%x/COMMAND",   g_device_id);  // For receiving commands
-  sprintf(g_mqtt_raw_topic,       "tele/%x/RAW",       g_device_id);  // Data from PMS
-  sprintf(g_mqtt_json_topic,      "tele/%x/JSON",      g_device_id);  // Data from PMS
+  sprintf(g_mqtt_raw_topic,       "tele/%x/RAW",       g_device_id);  // Data from multimeter
+  sprintf(g_mqtt_json_topic,      "tele/%x/JSON",      g_device_id);  // Data from multimeter
 
   // Report the MQTT topics to the serial console
   Serial.println(g_command_topic);       // For receiving messages
@@ -88,8 +96,11 @@ void setup()
   Serial.println(g_mqtt_json_topic);     // From PMS
 
   // Connect to WiFi
-  if (initWifi()) {
+  if (initWifi())
+  {
     Serial.println(WiFi.localIP());
+    pixels.setPixelColor(0, pixels.Color(0, 0, 50));  // Blue
+    pixels.show();
   } else {
     Serial.println("WiFi connection failed");
   }
@@ -111,7 +122,7 @@ void loop() {
   }
   client.loop();  // Process any outstanding MQTT messages
 
-  /* Report random value */
+  /* Report value */
   String message_string;
   if (ut61e.available())
   {
@@ -121,10 +132,14 @@ void loop() {
     {
       if (10 == this_character)
       {
+        pixels.setPixelColor(0, pixels.Color(0, 255, 0));  // Green
+        pixels.show();
         g_mqtt_message_buffer[g_buffer_position] = 0;
         g_buffer_position = 0;
         client.publish(g_mqtt_raw_topic, g_mqtt_message_buffer);
         Serial.println(g_mqtt_message_buffer);
+        pixels.setPixelColor(0, pixels.Color(0, 0, 0));  // Green
+        pixels.show();
       }
     } else {
       g_mqtt_message_buffer[g_buffer_position] = this_character;
@@ -224,6 +239,8 @@ void reconnectMqtt() {
       // Once connected, publish an announcement
       sprintf(g_mqtt_message_buffer, "Device %s starting up", mqtt_client_id);
       client.publish(status_topic, g_mqtt_message_buffer);
+      pixels.setPixelColor(0, pixels.Color(0, 50, 0));  // Dim green
+      pixels.show();
       // Resubscribe
       //client.subscribe(g_command_topic);
     } else {
