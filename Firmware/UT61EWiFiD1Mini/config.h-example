@@ -1,7 +1,7 @@
 /* ----------------- General config -------------------------------- */
 /* WiFi */
 const char* ssid                  = "YOUR SSID";     // Your WiFi SSID
-const char* password              = "YOUR PSK";      // Your WiFi password
+const char* password              = "YOUR PASS";     // Your WiFi password
 
 /* MQTT */
 const char* mqtt_broker           = "192.168.1.111"; // IP address of your MQTT broker

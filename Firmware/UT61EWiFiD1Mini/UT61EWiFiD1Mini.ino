@@ -1,29 +1,28 @@
 /*
-  UT61e to MQTT firmware (ESP32 version)
+  UT61e to MQTT firmware (ESP8266 version)
 
   Written by Jonathan Oxer for www.superhouse.tv
    https://github.com/superhouse/UT61EWIFI
 
   Read from a UNI-T UT61e multimeter and publish the data to an MQTT
-  broker.
+  broker. Intended for use with a Wemos D1 Mini. The pin numbers
+  used are based on the D1 Mini board profile.
 
   External dependencies. Install using the Arduino library manager:
     - "PubSubClient" by Nick O'Leary
     - "NeoPixel" by Adafruit
 
 */
-#define VERSION "1.0"
+#define VERSION "1.1"
 
 /*--------------------------- Configuration ------------------------------*/
 // Configuration should be done in the included file:
 #include "config.h"
 
 /*--------------------------- Libraries ----------------------------------*/
-//#include <WiFi.h>                     // ESP32 WiFi driver
 #include <ESP8266WiFi.h>              // ESP8266 WiFi driver
 #include <PubSubClient.h>             // For MQTT
 #include <Adafruit_NeoPixel.h>        // For status LED
-//#include <HardwareSerial.h>           // ESP32 second serial port
 #include <SoftwareSerial.h>           // Must be the EspSoftwareSerial library
 
 
@@ -32,8 +31,8 @@
 char g_mqtt_message_buffer[150];    // General purpose buffer for MQTT messages
 uint8_t g_buffer_position    = 0;
 char g_command_topic[50];           // MQTT topic for receiving commands
-char g_mqtt_raw_topic[50];          // MQTT topic for reporting pm1.0 AE value
-char g_mqtt_json_topic[50];         // MQTT topic for reporting pm1.0 AE value
+char g_mqtt_raw_topic[50];          // MQTT topic for reporting the raw data packet
+char g_mqtt_json_topic[50];         // MQTT topic for reporting the decoded reading
 
 // Wifi
 #define WIFI_CONNECT_INTERVAL          500   // Wait 500ms intervals for wifi connection
@@ -50,7 +49,6 @@ void reconnectMqtt();
 // MQTT
 WiFiClient esp_client;
 PubSubClient client(esp_client);
-//HardwareSerial ut61e(1);
 SoftwareSerial ut61e(UT61E_RX_PIN, -1); // RX, TX
 Adafruit_NeoPixel pixels(1, STATUS_LED_PIN, NEO_GRB + NEO_KHZ800);
 
@@ -62,32 +60,31 @@ void setup()
 {
   pixels.begin();
   pixels.clear();
-  pixels.setPixelColor(0, pixels.Color(50, 0, 0));  // Red
+  pixels.show();
+  pixels.setBrightness(50);
+  pixels.setPixelColor(0, pixels.Color(100, 0, 0));  // Red
   pixels.show();
 
   Serial.begin(SERIAL_BAUD_RATE);
   Serial.println();
   Serial.print("UT61e multimeter WiFi/USB interface starting up, v");
   Serial.println(VERSION);
+  Serial.println("For more information see https://www.superhouse.tv/ut61ewifi");
 
 
   // Open a connection to the PMS and put it into passive mode
-  //ut61e.begin(UT61E_BAUD_RATE, SERIAL_7O1, UT61E_RX_PIN, -1);  // Connection for multimeter
   ut61e.begin(UT61E_BAUD_RATE, SWSERIAL_7O1, UT61E_RX_PIN, -1);  // Connection for multimeter
 
   // We need a unique device ID for our MQTT client connection
-  //uint64_t macAddress = ESP.getEfuseMac();
   g_device_id = ESP.getChipId();  // Get the unique ID of the ESP8266 chip
-  //uint64_t macAddressTrunc = macAddress << 40;
-  //g_device_id = macAddressTrunc >> 40;
   Serial.print("Device ID: ");
   Serial.println(g_device_id, HEX);
 
   // Set up the topics for publishing sensor readings. By inserting the unique ID,
   // the result is of the form: "device/d9616f/PM1P0" etc
-  sprintf(g_command_topic,        "cmnd/%x/COMMAND",   g_device_id);  // For receiving commands
-  sprintf(g_mqtt_raw_topic,       "tele/%x/RAW",       g_device_id);  // Data from multimeter
-  sprintf(g_mqtt_json_topic,      "tele/%x/JSON",      g_device_id);  // Data from multimeter
+  sprintf(g_command_topic,        "cmnd/%X/COMMAND",   g_device_id);  // For receiving commands
+  sprintf(g_mqtt_raw_topic,       "tele/%X/RAW",       g_device_id);  // Data from multimeter
+  sprintf(g_mqtt_json_topic,      "tele/%X/JSON",      g_device_id);  // Data from multimeter
 
   // Report the MQTT topics to the serial console
   Serial.println(g_command_topic);       // For receiving messages
@@ -99,7 +96,7 @@ void setup()
   if (initWifi())
   {
     Serial.println(WiFi.localIP());
-    pixels.setPixelColor(0, pixels.Color(0, 0, 50));  // Blue
+    pixels.setPixelColor(0, pixels.Color(0, 0, 100));  // Blue
     pixels.show();
   } else {
     Serial.println("WiFi connection failed");
@@ -146,12 +143,6 @@ void loop() {
       g_buffer_position++;
     }
   }
-  //message_string = String(random(1, 100));
-  //Serial.println(message_string);
-
-
-
-  //delay(3000);
 }
 
 
@@ -179,8 +170,8 @@ void reportToMqtt()
   //    pms_data.pm10_env, pms_data.pm25_env, pms_data.pm100_env,
   //    pms_data.particles_03um, pms_data.particles_05um, pms_data.particles_10um, pms_data.particles_25um, pms_data.particles_50um, pms_data.particles_100um);
   /*
-    sprintf(g_mqtt_message_buffer,  "{\"PMS5003\":{\"PM1\":%i,\"PM2.5\":%i,\"PM10\":%i}}",
-            g_pm1p0_ae_value, g_pm2p5_ae_value, g_pm10p0_ae_value);
+    sprintf(g_mqtt_message_buffer,  "{\"UT61E\":{\"RANGE\":%i,\"VALUE\":%i}}",
+            g_ut61e_range, g_ut61e_value);
     client.publish(g_mqtt_json_topic, g_mqtt_message_buffer);
   */
 }
@@ -224,7 +215,7 @@ bool initWifi() {
 */
 void reconnectMqtt() {
   char mqtt_client_id[20];
-  sprintf(mqtt_client_id, "esp32-%x", g_device_id);
+  sprintf(mqtt_client_id, "esp8266-%X", g_device_id);
 
   // Loop until we're reconnected
   while (!client.connected()) {
@@ -243,11 +234,13 @@ void reconnectMqtt() {
       pixels.show();
       // Resubscribe
       //client.subscribe(g_command_topic);
+      Serial.println("done");
     } else {
       //Serial.print("failed, rc=");
       //Serial.print(client.state());
       //Serial.println(" try again in 5 seconds");
       // Wait 5 seconds before retrying
+      Serial.println("FAILED");
       delay(5000);
     }
   }
