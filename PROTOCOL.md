@@ -28,4 +28,4 @@ various fields. The fields are:
  * absValue (float): the absolute value of the latest measurement, with no sign.
  * negative (boolean): whether the measured value is negative.
 
-"value":"-24.318","currentType":"DC","unit":"V","absValue":"24.318","negative":false
+{"value":"-24.318","currentType":"DC","unit":"V","absValue":"24.318","negative":false}
