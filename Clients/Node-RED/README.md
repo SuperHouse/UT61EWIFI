@@ -35,7 +35,7 @@ Note: Do not include the port.
 
 You are able to customise the Web UI URL. By default this is set to:
 
- **<your-node-red-host/>ut61e** For example: **http://nodered.local/ut61e**
+ **your-node-red-host/ut61e** For example: **http://nodered.local/ut61e**
 
 Expected JSON format
 --------------------
