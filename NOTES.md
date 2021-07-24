@@ -1,3 +1,11 @@
+JSON format based on Aaron's idea?
+{"currentType":"DC","unit":"V","value":"-24.120","absValue":"24.129","negative":true}
+
+Check out Homie JSON format.
+SCPI message format.
+
+
+
 The schematic for the RS232 adapter is wrong! See here:  
 http://www.designelectronics.com.au/DesignElectronics_UT61E-APO.htm
 
