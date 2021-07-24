@@ -1,3 +1,4 @@
+
 /*
   UT61e to MQTT firmware (ESP8266 version)
 
@@ -21,9 +22,11 @@
 
 /*--------------------------- Libraries ----------------------------------*/
 #include <ESP8266WiFi.h>              // ESP8266 WiFi driver
-#include <PubSubClient.h>             // For MQTT
+// #include <PubSubClient.h>             // For MQTT
 #include <Adafruit_NeoPixel.h>        // For status LED
 #include <SoftwareSerial.h>           // Must be the EspSoftwareSerial library
+#include <ArduinoMqttClient.h>
+#include <MqttClient.h>
 
 
 /*--------------------------- Global Variables ---------------------------*/
@@ -234,7 +237,7 @@ void reconnectMqtt() {
       pixels.show();
       // Resubscribe
       //client.subscribe(g_command_topic);
-      Serial.println("done");
+      Serial.println("success");
     } else {
       //Serial.print("failed, rc=");
       //Serial.print(client.state());
