@@ -22,10 +22,18 @@ JSON message
 The parsed values are published as a unified JSON message containing
 various fields. The fields are:
 
- * value (float): the measured value, including sign if the value is negative.
- * currentType (string): ?
+ * currentType (string):
  * unit (string): the units for the measured value.
- * absValue (float): the absolute value of the latest measurement, with no sign.
+ * value (float): the measured value, including sign if the value is negative.
+ * absValue (string): the absolute value of the latest measurement, with no sign.
  * negative (boolean): whether the measured value is negative.
 
-{"value":"-24.318","currentType":"DC","unit":"V","absValue":"24.318","negative":false}
+```
+{
+  "currentType":"AC",
+  "unit":"V",
+  "value":-24.318,
+  "absValue":"24.419",
+  "negative":true
+}
+```
