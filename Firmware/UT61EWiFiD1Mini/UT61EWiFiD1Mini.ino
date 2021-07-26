@@ -22,11 +22,12 @@
 
 /*--------------------------- Libraries ----------------------------------*/
 #include <ESP8266WiFi.h>              // ESP8266 WiFi driver
-// #include <PubSubClient.h>             // For MQTT
+#include <PubSubClient.h>             // For MQTT
 #include <Adafruit_NeoPixel.h>        // For status LED
 #include <SoftwareSerial.h>           // Must be the EspSoftwareSerial library
-#include <ArduinoMqttClient.h>
-#include <MqttClient.h>
+//#include <ArduinoMqttClient.h>
+//#include <MqttClient.h>
+#include <ut61e.h>
 
 
 /*--------------------------- Global Variables ---------------------------*/
@@ -36,6 +37,7 @@ uint8_t g_buffer_position    = 0;
 char g_command_topic[50];           // MQTT topic for receiving commands
 char g_mqtt_raw_topic[50];          // MQTT topic for reporting the raw data packet
 char g_mqtt_json_topic[50];         // MQTT topic for reporting the decoded reading
+char g_json_message_buffer[256];    // MQTT JSON data for reporting JSON format
 
 // Wifi
 #define WIFI_CONNECT_INTERVAL          500   // Wait 500ms intervals for wifi connection
@@ -54,6 +56,7 @@ WiFiClient esp_client;
 PubSubClient client(esp_client);
 SoftwareSerial ut61e(UT61E_RX_PIN, -1); // RX, TX
 Adafruit_NeoPixel pixels(1, STATUS_LED_PIN, NEO_GRB + NEO_KHZ800);
+UT61E dmm;
 
 /*--------------------------- Program ---------------------------------------*/
 /**
@@ -110,7 +113,7 @@ void setup()
   client.setCallback(callback);
 }
 
-/**
+/*
   Main loop
 */
 void loop() {
@@ -128,22 +131,54 @@ void loop() {
   {
     byte this_character = ut61e.read();
     //Serial.write(this_character);
-    if (10 == this_character || 13 == this_character)
-    {
-      if (10 == this_character)
-      {
+    g_mqtt_message_buffer[g_buffer_position] = this_character;
+    g_buffer_position++;
+    if((13 == g_mqtt_message_buffer[g_buffer_position-2]) && (10 == g_mqtt_message_buffer[g_buffer_position-1]) ) {
+      if(dmm.check(g_mqtt_message_buffer)) {
         pixels.setPixelColor(0, pixels.Color(0, 255, 0));  // Green
         pixels.show();
-        g_mqtt_message_buffer[g_buffer_position] = 0;
+        g_mqtt_message_buffer[g_buffer_position-2] = 0;
         g_buffer_position = 0;
         client.publish(g_mqtt_raw_topic, g_mqtt_message_buffer);
-        Serial.println(g_mqtt_message_buffer);
-        pixels.setPixelColor(0, pixels.Color(0, 0, 0));  // Green
+        Serial.print(g_mqtt_message_buffer);
+        pixels.setPixelColor(0, pixels.Color(0, 0, 0));  // Off
+        pixels.show();
+        dmm.parse(g_mqtt_message_buffer);
+        if (!dmm.hold)
+        {
+          // Strictly Jon's definition
+// The parsed values are published as a unified JSON message containing
+// various fields. The fields are:
+
+//  * value (float): the measured value, including sign if the value is negative.
+//  * currentType (string): ?
+//  * unit (string): the units for the measured value.
+//  * absValue (float): the absolute value of the latest measurement, with no sign.
+//  * negative (boolean): whether the measured value is negative.
+// {
+//   "currentType":"AC",
+//   "unit":"V",
+//   "value":-24.318,
+//   "absValue":"24.419",
+//   "negative":true
+// }
+
+          sprintf(g_json_message_buffer,"{\"currentType\":\"%s\",\"unit\":\"%s\",\"value\":%.4f,\"absValue\":\"%.4f\",\"negative\":%s}",
+          dmm.getPower(), dmm.getMode(), dmm.value, abs(dmm.value), dmm.value<0?"true":"false");
+          // Everything we've got
+          // sprintf(g_json_message_buffer,"{\"sampleNumber\":\"%lu\",\"value\":\"%.5f\",\"valueMax\":\"%.5f\",\"valueMin\":\"%.5f\",\"valueAverage\":\"%.5f\",\"mode\":\"%s\",\"currentType\":\"%s\",\"range\":\"%s\",\"frequencyMode\":\"%s\"}", dmm.sample, dmm.value, dmm.max , dmm.min, dmm.average , dmm.getMode() , dmm.getPower(),dmm.getRange(),dmm.getFMode());
+          Serial.println(g_json_message_buffer);
+          client.publish(g_mqtt_json_topic, g_json_message_buffer);
+        }
+      } else { // Data error
+        pixels.setPixelColor(0, pixels.Color(255, 0, 0));  // Red
+        pixels.show();
+        g_buffer_position = 0;
+        client.publish(g_mqtt_raw_topic, g_mqtt_message_buffer);
+        sprintf(g_json_message_buffer,"{\"error\":\"invalid data!\"}");
+        pixels.setPixelColor(0, pixels.Color(0, 0, 0));  // Off
         pixels.show();
       }
-    } else {
-      g_mqtt_message_buffer[g_buffer_position] = this_character;
-      g_buffer_position++;
     }
   }
 }
