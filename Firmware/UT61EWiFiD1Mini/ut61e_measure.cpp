@@ -1,9 +1,10 @@
 /*
  * ut61e_measure.cpp
  *
- *  Created on: 12.11.2009
- *      Author: steffen vogel
- *         git: https://github.com/stv0g/dmm_ut61e
+ *  Created on: 2021-07-25
+ *         git: https://github.com/cabletie/UT61EWIFI
+ *      Author: CableTie
+ *    Based on: https://github.com/stv0g/dmm_ut61e by Steffen Vogel
  */
 
 #include "ut61e_measure.h"

@@ -2,8 +2,9 @@
  * ut61e_measure.h
  *
  *  Created on: 2021-07-25
+ *         git: https://github.com/cabletie/UT61EWIFI
  *      Author: CableTie
- *    Based on: https://github.com/stv0g/dmm_ut61e
+ *    Based on: https://github.com/stv0g/dmm_ut61e by Steffen Vogel
  */
 
 #ifndef UT61E_MEAS_H_
