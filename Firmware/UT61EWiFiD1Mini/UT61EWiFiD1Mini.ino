@@ -27,6 +27,18 @@
 #include <PubSubClient.h>             // For MQTT
 #include <Adafruit_NeoPixel.h>        // For status LED
 #include <SoftwareSerial.h>           // Must be the EspSoftwareSerial library
+
+/*--------------------------- About ut61e_measure ------------------------*/
+
+// This library is contained locally
+// It is a stop-gap measure to get some readings happpening uintil a more
+// correct library can be made available.
+// This library provides MEASUREMENTS fromt he DMM, not display output
+// status. e.g. rather than providing a string representing the digits and
+// decimal displayed on th escreen, it outputs a float. It also does not 
+// correctly reflect engineering multipliers.
+// Stay tuned, more to come - @cabletie
+
 #include "ut61e_measure.h"
 
 
