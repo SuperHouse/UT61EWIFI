@@ -22,11 +22,9 @@
 
 /*--------------------------- Libraries ----------------------------------*/
 #include <ESP8266WiFi.h>              // ESP8266 WiFi driver
- #include <PubSubClient.h>             // For MQTT
+#include <PubSubClient.h>             // For MQTT
 #include <Adafruit_NeoPixel.h>        // For status LED
 #include <SoftwareSerial.h>           // Must be the EspSoftwareSerial library
-//#include <ArduinoMqttClient.h>
-//#include <MqttClient.h>
 #include <ut61e_measure.h>
 
 
