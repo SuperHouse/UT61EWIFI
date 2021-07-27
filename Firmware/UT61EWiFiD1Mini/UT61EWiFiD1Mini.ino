@@ -13,6 +13,8 @@
     - "PubSubClient" by Nick O'Leary
     - "NeoPixel" by Adafruit
 
+  Requires C++ Exceptions enabled Arduino --> Tools --> C++ Exceptions --> Enabled
+
 */
 #define VERSION "1.2"
 
@@ -25,7 +27,7 @@
 #include <PubSubClient.h>             // For MQTT
 #include <Adafruit_NeoPixel.h>        // For status LED
 #include <SoftwareSerial.h>           // Must be the EspSoftwareSerial library
-#include <ut61e_measure.h>
+#include "ut61e_measure.h"
 
 
 /*--------------------------- Global Variables ---------------------------*/
