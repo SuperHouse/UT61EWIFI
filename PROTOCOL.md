@@ -22,18 +22,36 @@ JSON message
 The parsed values are published as a unified JSON message containing
 various fields. The fields are:
 
- * currentType (string):
- * unit (string): the units for the measured value.
- * value (float): the measured value, including sign if the value is negative.
- * absValue (string): the absolute value of the latest measurement, with no sign.
- * negative (boolean): whether the measured value is negative.
+* value (float): the measured value, including sign if the value is negative. 
+* unit (string): the units for the measured value.
+* display_value (float): the measured value, including sign if the value is negative. 
+* display_unit (string): the units for the measured value.
+* display_string (string): the measured value, it does not include the sign if the value is negative.
+* mode (string): [Description Required]
+* currentType (string): [Description Required]
+* peak (string): [Description Required]
+* relative (string): [Description Required]
+* hold (string): [Description Required]
+* range (string): [Description Required]
+* operation (string): [Description Required]
+* battery_low (string): [Description Required]
+* negative (boolean): [Description Required]
 
 ```
 {
-  "currentType":"AC",
-  "unit":"V",
-  "value":-24.318,
-  "absValue":"24.419",
-  "negative":true
+  "value": 242.69,
+  "unit": "V",
+  "display_value": 242.69,
+  "display_unit": "V",
+  "display_string": "0242.7",
+  "mode": "voltage",
+  "currentType": "AC",
+  "peak": "",
+  "relative": "0",
+  "hold": "0",
+  "range": "auto",
+  "operation": "normal",
+  "battery_low": "0",
+  "negative": false
 }
 ```
