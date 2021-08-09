@@ -18,6 +18,12 @@ Configure MQTT
 Data is received via an MQTT broker. In Node, add an "MQTT In" Node,
 ensuring you configure your MQTT Broker and Topic. For example:
 
+```
+tele/ut61e/json
+
+tele/7054A0_x/JSON
+```
+
  **tele/ut61e/json**
 
 Note: UT61e Web UI expects the JSON Topic provided by the UT61e Wifi
@@ -57,7 +63,24 @@ The Node expects to receive messages in the format provided by the UT61e
 WiFi Adapter firmware. This is still subject to change. Currently the
 format looks like:
 
-**{"currentType":"AC","unit":"V","value":-24.318,"absValue":"24.419","negative":true}**
+```
+{
+  "value": 242.69,
+  "unit": "V",
+  "display_value": 242.69,
+  "display_unit": "V",
+  "display_string": "0242.7",
+  "mode": "voltage",
+  "currentType": "AC",
+  "peak": "",
+  "relative": "0",
+  "hold": "0",
+  "range": "auto",
+  "operation": "normal",
+  "battery_low": "0",
+  "negative": false
+}
+```
 
 Need help?
 ----------

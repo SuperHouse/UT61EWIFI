@@ -39,6 +39,8 @@ project.
 Credits
 -------
   * Jonathan Oxer <jon@oxer.com.au>
+  * CableTie <https://github.com/cabletie>
+  * Aaron Knox <aaron@makerdock.io>
 
 
 License
