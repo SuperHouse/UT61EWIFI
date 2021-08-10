@@ -66,9 +66,8 @@ union packet_u_t
 class UT61E_DISP {
 	private:
 		packet_u_t packet;
-		bool _parse(bool);
+		bool _parse();
 		bit_map_t get_bits(uint8_t b, status_map_t bitmap);
-		stringstream results;
 		void dump_map(bit_map_t m);
 		void print_byte(uint8_t byte);
 		HardwareSerial *serial {0};
@@ -124,9 +123,10 @@ class UT61E_DISP {
 			UT61E_DISP(HardwareSerial &s);
 			~UT61E_DISP() { }
 
-			bool parse(char const *, bool);
-			bool parse(uint8_t const *, bool);
-			const char *get(); // Format results into a string stream then return its .str
+			bool parse(char const *);
+			bool parse(uint8_t const *);
+			// Format results into a string stream then return it
+			const string get(); 
 };
 
 #endif /* UT61E_DISP_H_ */

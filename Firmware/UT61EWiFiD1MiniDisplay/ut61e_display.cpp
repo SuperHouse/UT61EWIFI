@@ -52,15 +52,15 @@ bit_map_t UT61E_DISP::get_bits(uint8_t b, status_map_t bitmap)
 };
 
 // Wrapper to take chars as packet
-bool UT61E_DISP::parse(char const c[12], bool e){
+bool UT61E_DISP::parse(char const c[12]){
     strncpy(packet.char_packet,c,12);
-    return _parse(e);
+    return _parse();
 };
 
 // Wrapper to take chars as packet
-bool UT61E_DISP::parse(uint8_t const u[12], bool e){
+bool UT61E_DISP::parse(uint8_t const u[12]){
     memcpy(packet.raw_packet,u,12);
-    return _parse(e);
+    return _parse();
 };
 
 // All the status and info bits
@@ -271,7 +271,8 @@ void UT61E_DISP::print_byte(uint8_t byte)
 // The most important function of this module:
 // Parses 12-byte-long packets from the UT61E DMM and returns
 // a dictionary with all information extracted from the packet.
-bool UT61E_DISP::_parse(bool extended_format = false){
+bool UT61E_DISP::_parse()
+{
     // an unordered map of bit names and their values
     bit_map_t options;
 
@@ -317,28 +318,28 @@ bool UT61E_DISP::_parse(bool extended_format = false){
     options.merge(get_bits(packet.pb.d_option4, OPTION4));
 
     Function_Dict dial_function = DIAL_FUNCTION[packet.pb.d_function];
-     
-    // # When the rotary switch is set to 'voltage' or 'ampere' mode and then you 
+
+    // # When the rotary switch is set to 'voltage' or 'ampere' mode and then you
     // # press the frequency button, the meter shows 'Hz' (or '%') but the
     // # function byte is still the same as before so we have to correct for that:
-    if(options["VAHZ"])
+    if (options["VAHZ"])
         dial_function = DIAL_FUNCTION[0b0110010];
     mode = dial_function.function;
     Range_Dict m_range = dial_function.subfunction[packet.pb.d_range];
     unit = dial_function.unit;
-    if(mode == "frequency" and options["JUDGE"])
+    if (mode == "frequency" and options["JUDGE"])
     {
         mode = "duty_cycle";
         unit = "%";
         m_range = {1e0, 1, "%"}; // 2200.0°C
     };
-    if(options["AC"] and options["DC"])
+    if (options["AC"] and options["DC"])
         std::exception(); // ValueError
     else if (options["DC"])
         currentType = "DC";
     else if (options["AC"])
         currentType = "AC";
-    
+
     operation = "normal";
     // sometimes there a glitch where both UL and OL are enabled in normal operation
     // so no error is raised when it occurs
@@ -346,7 +347,7 @@ bool UT61E_DISP::_parse(bool extended_format = false){
         operation = "underload";
     else if (options["OL"])
         operation = "overload";
-    
+
     if (options["AUTO"])
         mrange = "auto";
     else
@@ -356,127 +357,114 @@ bool UT61E_DISP::_parse(bool extended_format = false){
         battery_low = true;
     else
         battery_low = false;
-    
-    // relative measurement mode, received value is actual!
+
+    // Relative measurement mode, received value is actual!
     if (options["REL"])
         relative = true;
     else
         relative = false;
 
-    // data hold mode, received value is actual!
+    // Data hold mode, received value is actual!
     if (options["HOLD"])
         hold = true;
     else
         hold = false;
-   
-    if (options["MAX"]) 
+
+    if (options["MAX"])
     {
         peak = "max";
-        if(serial)
-            serial->printf("{MAX : %d}",options["MAX"]);
+        if (serial)
+            serial->printf("{MAX : %d}", options["MAX"]);
     }
     else if (options["MIN"])
     {
         peak = "min";
-        if(serial)
-            serial->printf("{MIN : %d}",options["MIN"]);
+        if (serial)
+            serial->printf("{MIN : %d}", options["MIN"]);
     }
     else
         peak = "";
-    
+
     if (mode == "current" and options["VBAR"])
-        ;
         // """Auto μA Current
         // Auto mA Current"""
-    else if (mode == "current" and not options["VBAR"])
         ;
+    else if (mode == "current" and not options["VBAR"])
         // """Auto 220.00A/2200.0A
         // Auto 22.000A/220.00A"""
-    
+        ;
+
     if (mode == "temperature" and options["VBAR"])
         m_range = {1e0, 1, "deg"}; // 2200.0°C
     else if (mode == "temperature" and not options["VBAR"])
         m_range = {1e0, 2, "deg"}; // 220.00°C and °F
 
-    int d4,d3,d2,d1,d0;
+    int d4, d3, d2, d1, d0;
     d4 = LCD_DIGITS[packet.pb.d_digit4];
     d3 = LCD_DIGITS[packet.pb.d_digit3];
     d2 = LCD_DIGITS[packet.pb.d_digit2];
     d1 = LCD_DIGITS[packet.pb.d_digit1];
     d0 = LCD_DIGITS[packet.pb.d_digit0];
 
-    vector<int> digit_array = {d0,d1,d2,d3,d4};
+    vector<int> digit_array = {d0, d1, d2, d3, d4};
 
-    // char display_string[7];
-    // stringstream display_string;
-
-    sprintf(display_string,".%1d%1d%1d%1d%1d",d4,d3,d2,d1,d0);
-    for (size_t i = 0; i < (5 - m_range.dp_digit_position); i++)
-        {
-        display_string[i]=display_string[i+1];
-        display_string[i+1]='.';
-    }
-    
-    if(serial)
+    // Do some hokery pokery and move the dp into position
+    sprintf(display_string, ".%1d%1d%1d%1d%1d", d4, d3, d2, d1, d0);
+    for (int i = 0; i < (5 - m_range.dp_digit_position); i++)
     {
-        serial->printf("{dp_position : %d}",m_range.dp_digit_position);
-        serial->printf("{display_string : %s}",display_string);
+        display_string[i] = display_string[i + 1];
+        display_string[i + 1] = '.';
+    }
+
+    // Strip leading zeroes from the string
+    for (int i = 0; i < 6; i++)
+    {
+        if(display_string[i] == '0' && display_string[i + 1] != '.')
+            display_string[i] = ' ';
+        else
+            break;
+    }
+
+    if (serial)
+    {
+        serial->printf("{dp_position : %d}", m_range.dp_digit_position);
+        serial->printf("{display_string : %s}", display_string);
     }
     display_value = 0;
-    for (int i = 0; i<5;i++)
-        display_value += digit_array[i]*pow(10,i);
-    if(options["SIGN"])
+    for (int i = 0; i < 5; i++)
+        display_value += digit_array[i] * pow(10, i);
+    if (options["SIGN"])
     {
         display_value = -display_value;
         sign = true;
-    } else {
+    }
+    else
+    {
         sign = false;
     }
-    display_value = display_value / pow(10,m_range.dp_digit_position);
+    display_value = display_value / pow(10, m_range.dp_digit_position);
     display_unit = m_range.display_unit;
     value = float(display_value) * m_range.value_multiplier;
-    
-    if(operation != "normal"){
+
+    if (operation != "normal")
+    {
         display_value = 0;
         value = 0;
-    if(serial)
-        serial->println(operation.c_str());
+        if(operation == "overload")
+            sprintf(display_string," OL.  ");
+        if(operation == "underload")
+            sprintf(display_string," UL.  ");
+        if (serial)
+            serial->println(operation.c_str());
 
-    return true;
-}
-
-    // detailed_results = {
-    //     'packet_details' : {
-    //         'raw_data_binary' :  packet,
-    //         'raw_data_hex'    :  ' '.join('0x{:02X}'.format(x) for x in packet),
-    //         'data_bytes' : {
-    //             'd_range'    :  d_range,
-    //             'd_digit4'   :  d_digit4,
-    //             'd_digit3'   :  d_digit3,
-    //             'd_digit2'   :  d_digit2,
-    //             'd_digit1'   :  d_digit1,
-    //             'd_digit0'   :  d_digit0,
-    //             'd_function' :  d_function,
-    //             'd_status'   :  d_status,
-    //             'd_option1'  :  d_option1,
-    //             'd_option2'  :  d_option2,
-    //             'd_option3'  :  d_option3,
-    //             'd_option4'  :  d_option4
-    //         },
-    //         'options' :  options,
-    //         'range'   :  {
-    //             'value_multiplier' : m_range[0],
-    //             'dp_digit_position' : m_range[1],
-    //             'display_unit' : m_range[2]
-    //         }
-    //     },
-    //     'display_value' : str(display_value)
-    // }
+        return true;
+    }
     return true;
 };
 
-const char *UT61E_DISP::get(){
-    results.clear();
+// An easy way to get all values in one go
+const string UT61E_DISP::get(){
+    stringstream results;
     results << 
         "value:" << value <<
         ",unit:" << unit << 
@@ -490,6 +478,5 @@ const char *UT61E_DISP::get(){
         ",range:" << mrange <<
         ",operation:" << operation <<
         ",battery_low:" << battery_low;
- //   results_string = results.str();
-    return results.str().c_str();
+    return results.str();
 }

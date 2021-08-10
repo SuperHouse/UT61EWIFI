@@ -15,13 +15,14 @@
 
 */
 #define VERSION "2.1"
-#define DEBUG
+// #define DEBUG
+
 /*--------------------------- Configuration ------------------------------*/
 // Configuration should be done in the included file:
 #include "config.h"
 
 /*--------------------------- Libraries ----------------------------------*/
-// #include <Arduino.h>
+#include <Arduino.h>
 #include <ESP8266WiFi.h>              // ESP8266 WiFi driver
 #include <PubSubClient.h>             // For MQTT
 #include <Adafruit_NeoPixel.h>        // For status LED
@@ -38,7 +39,7 @@ char g_command_topic[50];             // MQTT topic for receiving commands
 char g_mqtt_raw_topic[50];            // MQTT topic for reporting the raw data packet
 char g_mqtt_hex_topic[50];            // MQTT topic for reporting the hex formatted data packet
 char g_mqtt_json_topic[50];           // MQTT topic for reporting the decoded reading
-char g_mqtt_json_extended_topic[50];  // MQTT topic for reporting the decoded reading
+// char g_mqtt_json_extended_topic[50];  // MQTT topic for reporting the decoded reading
 char g_json_message_buffer[512];      // MQTT JSON data for reporting JSON format
 
 // Wifi
@@ -51,6 +52,8 @@ uint32_t g_device_id;                        // Unique ID from ESP chip ID
 /*--------------------------- Function Signatures ---------------------------*/
 bool initWifi();
 void reconnectMqtt();
+void callback(char* topic, byte* message, unsigned int length);
+void reportToMqtt();
 
 /*--------------------------- Instantiate Global Objects --------------------*/
 // MQTT
@@ -58,7 +61,8 @@ WiFiClient esp_client;
 PubSubClient client(esp_client);
 SoftwareSerial ut61e(UT61E_RX_PIN, -1); // RX, TX
 Adafruit_NeoPixel pixels(1, STATUS_LED_PIN, NEO_GRB + NEO_KHZ800);
-// HardwareSerial Serial;
+
+// Passsing the serial object to the dmm ctor enables debug output on the serial port.
 #ifdef DEBUG
 UT61E_DISP dmm(Serial);
 #else
@@ -94,21 +98,18 @@ void setup()
   Serial.println(g_device_id, HEX);
 
   // Set up the topics for publishing sensor readings. By inserting the unique ID,
-  // the result is of the form: "device/d9616f/PM1P0" etc
+  // the result is of the form: "device/d9616f/RAW" etc
   sprintf(g_command_topic,            "cmnd/%X/COMMAND",   g_device_id);  // For receiving commands
   sprintf(g_mqtt_raw_topic,           "tele/%X/RAW",       g_device_id);  // Data from multimeter
   sprintf(g_mqtt_hex_topic,           "tele/%X/HEX",       g_device_id);  // Data from multimeter
   sprintf(g_mqtt_json_topic,          "tele/%X/JSON",      g_device_id);  // Data from multimeter
-  sprintf(g_mqtt_json_extended_topic, "tele/%X_x/JSON",    g_device_id);  // Extended data from multimeter
 
   // Report the MQTT topics to the serial console
   Serial.println("MQTT command topics:");
   Serial.println(g_command_topic);       // For receiving messages
   Serial.println("MQTT topics:");
   Serial.println(g_mqtt_raw_topic);               // From PMS
-  Serial.println(g_mqtt_hex_topic);               // From PMS
   Serial.println(g_mqtt_json_topic);              // From PMS
-  Serial.println(g_mqtt_json_extended_topic);     // From PMS
 
   // Connect to WiFi
   if (initWifi())
@@ -148,7 +149,7 @@ void loop() {
       // Copy only the data for parsing
       strncpy(g_packet_buffer,g_raw_packet_buffer,12);
       // If we successfully parse the packet, send it to the various destinations
-      if(dmm.parse(g_packet_buffer,false)) {
+      if(dmm.parse(g_packet_buffer)) {
         // Turn on LED to flash for each good packet we process
         pixels.setPixelColor(0, pixels.Color(0, 255, 0));  // Green
         pixels.show();
@@ -162,10 +163,6 @@ void loop() {
         // Publish a raw packet to MQTT
         client.publish(g_mqtt_raw_topic, g_raw_packet_buffer);
 
-        // Publish a HEX version of the raw packet to MQTT
-        sprintf(g_json_message_buffer,"%x",g_raw_packet_buffer);
-        client.publish(g_mqtt_hex_topic, g_json_message_buffer);
-
         // Echo to serial port
         Serial.println(g_raw_packet_buffer);
 
@@ -178,64 +175,55 @@ void loop() {
         // So we don't send any further JSON until this changes
         if (!dmm.hold)         
         { 
-          // The parsed values are published as a unified JSON message containing
-          // various fields. The fields are:
+         /* 
+          * The parsed values are published as a unified JSON message containing
+          * various fields. The fields are:
+          * value: Floating point actual value of reading. No multipliers. eg 1000 Ω not 1.000 kΩ
+          * unit: One of V,A,Ω,Hz,F,deg,% with no prefix
+          * display_value: Numerical value of the display digits. e.g 1 for when 1 kΩ or 220 for 220uF
+          * display_unit: One of V,A,Ω,Hz,F,deg,% with multiplier prefix such as M,k,m,u,n
+          * mode: Function selector mode. One of "voltage", "current", "resistance", "continuity",
+          *       "diode", "frequency", "capacitance", or  "temperature"
+          * currentType: "AC" or "DC"
+          * peak: Peak measurement mode one of "min" or "max"
+          * relative: In relative mode true or false
+          * hold: In hold mode true or false
+          * range: Range operation "manual" or "auto"
+          * operation: "Normal", "overload" or "underload"
+          * battery_low: true or false
+          * sign: Negative sign on, true or false
+          */
 
-          //  * value (float): the measured value, including sign if the value is negative.
-          //  * currentType (string): ?
-          //  * unit (string): the units for the measured value.
-          //  * absValue (float): the absolute value of the latest measurement, with no sign.
-          //  * negative (boolean): whether the measured value is negative.
-          // {
-          //   "currentType":"AC",
-          //   "unit":"V",
-          //   "value":-24.318,
-          //   "absValue":"24.419",
-          //   "negative":true
-          // }
-
-          // Basic measurement data
-          char _value[16];
+          // char _value[16];
           char _display_value[16];
 
-          snprintf(_value, dmm.sign?8:7, "%f", dmm.value);
-          snprintf(_display_value, 7, "%f", abs(dmm.display_value));
-
-          sprintf(g_json_message_buffer,"{\"currentType\":\"%s\",\"unit\":\"%s\",\"value\":%s,\"absValue\":%s,\"negative\":%s}",
-          dmm.currentType.c_str(), dmm.mode.c_str(), _value, _display_value, dmm.sign?"true":"false");
-          Serial.print("Squirrel JSON: ");
-          Serial.println(g_json_message_buffer);
-          // Official @superhousetv JSON spec.
-          client.publish(g_mqtt_json_topic, g_json_message_buffer);
-/* 
- * value: Floating point actual value of reading. No multipliers. eg 1000 Ω not 1.000 kΩ
- * unit: One of V,A,Ω,Hz,F,deg,% with no prefix
- * display_value: Numerical value of the display digits. e.g 1 for when 1 kΩ or 220 for 220uF
- * display_unit: One of V,A,Ω,Hz,F,deg,% with multiplier prefix such as M,k,m,u,n
- * mode: Function selector mode. One of "voltage", "current", "resistance", "continuity",
- *       "diode", "frequency", "capacitance", or  "temperature"
- * currentType: "AC" or "DC"
- * peak: Peak measurement mode one of "min" or "max"
- * relative: In relative mode "true" or "false"
- * hold: In hold mode "true" or "false"
- * range: Range operation "manual" or "auto"
- * operation: "Normal", "overload" or "underload"
- * battery_low: true or false
- * sign: Negative sign on, true or false
- */
-          snprintf(_value, dmm.sign?8:7, "%f", dmm.value);
+          // Print only the first 7 (or 8 if there is a negative sign) to the output string
+          // 7 Digits is 5 digit places, decimal point and string terminator null
+          // snprintf(_value, dmm.sign?8:7, "%f", dmm.value);
           snprintf(_display_value, dmm.sign?8:7, "%f", dmm.display_value);
 
-          sprintf(g_json_message_buffer,"{\"value\":%s,\"unit\":\"%s\",\"display_value\":%s,\"display_unit\":\"%s\",\"display_string\":\"%s\",\"mode\":\"%s\",\"currentType\":\"%s\",\"peak\":\"%s\",\"relative\":\"%i\",\"hold\":\"%i\",\"range\":\"%s\",\"operation\":\"%s\",\"battery_low\":\"%i\",\"negative\":%s}", _value, dmm.unit.c_str(), _display_value , dmm.display_unit.c_str(),dmm.display_string, dmm.mode.c_str() , dmm.currentType.c_str() , dmm.peak.c_str(),dmm.relative,dmm.hold,dmm.mrange.c_str(),dmm.operation.c_str(),dmm.battery_low, dmm.sign?"true":"false");
+          sprintf(g_json_message_buffer,"{\"value\":%f,\"unit\":\"%s\",\"display_value\":%s,\"display_unit\":\"%s\",\"display_string\":\"%s\",\"mode\":\"%s\",\"currentType\":\"%s\",\"peak\":\"%s\",\"relative\":%s,\"hold\":%s,\"range\":\"%s\",\"operation\":\"%s\",\"battery_low\":%s,\"negative\":%s}",
+           dmm.value,
+           dmm.unit.c_str(),
+           _display_value,
+           dmm.display_unit.c_str(),
+           dmm.display_string,
+           dmm.mode.c_str(),
+           dmm.currentType.c_str(),
+           dmm.peak.c_str(),
+           dmm.relative?"true":"false",
+           dmm.hold?"true":"false",
+           dmm.mrange.c_str(),
+           dmm.operation.c_str(),
+           dmm.battery_low?"true":"false",
+           dmm.sign?"true":"false");
 
           size_t msg_length = strlen(g_json_message_buffer);
 
           Serial.print("JSON: ");
           Serial.println(g_json_message_buffer);
-          // Extended @cabletie spec
-          client.beginPublish(g_mqtt_json_extended_topic, msg_length,false);
+          client.beginPublish(g_mqtt_json_topic, msg_length,false);
           client.print(g_json_message_buffer);
-          // client.publish(g_mqtt_json_extended_topic, g_json_message_buffer);
           client.endPublish();
         }
       } else { // Data error
