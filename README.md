@@ -9,8 +9,7 @@ and reports the data via WiFi or USB.
 
 The example firmware reads the data packet from the multimeter and
 publishes it to an MQTT broker, and also outputs it via the USB
-port at 115200bps. The data packet is not processed or interpreted
-in the current versions of the examples.
+port at 115200bps.
 
 ![UT61e WiFi Interface](Images/UT61EWIFI-v1_0-oblique-small.jpg)
 
@@ -39,6 +38,8 @@ project.
 Credits
 -------
   * Jonathan Oxer <jon@oxer.com.au>
+  * CableTie <https://github.com/cabletie>
+  * Aaron Knox <aaron@makerdock.io>
 
 
 License
@@ -52,3 +53,5 @@ repository contains a copy of this license in plain text format.
 The software portion of this project is licensed under the Simplified
 BSD License. The "licence" folder within this project contains a
 copy of this license in plain text format.
+
+The UNI-T logo is the trademark of Uni-Trend Technology (China) Co., Ltd.
