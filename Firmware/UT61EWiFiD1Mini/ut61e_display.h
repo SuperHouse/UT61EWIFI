@@ -1,5 +1,5 @@
 /*
- * ut61e_measure.h
+ * ut61e_display.h
  *
  *  Created on: 2021-07-25
  *      Author: CableTie

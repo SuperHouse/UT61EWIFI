@@ -451,13 +451,11 @@ bool UT61E_DISP::_parse()
         display_value = 0;
         value = 0;
         if(operation == "overload")
-            sprintf(display_string," OL.  ");
+            sprintf(display_string," 0L.  ");
         if(operation == "underload")
             sprintf(display_string," UL.  ");
         if (serial)
             serial->println(operation.c_str());
-
-        return true;
     }
     return true;
 };

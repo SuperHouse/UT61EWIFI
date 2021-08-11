@@ -13,43 +13,33 @@
     - "PubSubClient" by Nick O'Leary
     - "NeoPixel" by Adafruit
 
-  Requires C++ Exceptions enabled Arduino --> Tools --> C++ Exceptions --> Enabled
-
 */
-#define VERSION "1.2"
+#define VERSION "2.1"
+// #define DEBUG
 
 /*--------------------------- Configuration ------------------------------*/
 // Configuration should be done in the included file:
 #include "config.h"
 
 /*--------------------------- Libraries ----------------------------------*/
+#include <Arduino.h>                  // Make it cpp compliant
 #include <ESP8266WiFi.h>              // ESP8266 WiFi driver
 #include <PubSubClient.h>             // For MQTT
 #include <Adafruit_NeoPixel.h>        // For status LED
 #include <SoftwareSerial.h>           // Must be the EspSoftwareSerial library
-
-/*--------------------------- About ut61e_measure ------------------------*/
-
-// This library is contained locally
-// It is a stop-gap measure to get some readings happpening uintil a more
-// correct library can be made available.
-// This library provides MEASUREMENTS fromt he DMM, not display output
-// status. e.g. rather than providing a string representing the digits and
-// decimal displayed on th escreen, it outputs a float. It also does not 
-// correctly reflect engineering multipliers.
-// Stay tuned, more to come - @cabletie
-
-#include "ut61e_measure.h"
+#include "ut61e_display.h"
 
 
 /*--------------------------- Global Variables ---------------------------*/
 // MQTT
-char g_mqtt_message_buffer[150];    // General purpose buffer for MQTT messages
-uint8_t g_buffer_position    = 0;
-char g_command_topic[50];           // MQTT topic for receiving commands
-char g_mqtt_raw_topic[50];          // MQTT topic for reporting the raw data packet
-char g_mqtt_json_topic[50];         // MQTT topic for reporting the decoded reading
-char g_json_message_buffer[256];    // MQTT JSON data for reporting JSON format
+char g_raw_packet_buffer[150];      // General purpose buffer for MQTT messages
+char g_packet_buffer[12];             // Buffer for single DMM packet
+uint8_t g_buffer_position = 0;
+char g_command_topic[50];             // MQTT topic for receiving commands
+char g_mqtt_raw_topic[50];            // MQTT topic for reporting the raw data packet
+char g_mqtt_hex_topic[50];            // MQTT topic for reporting the hex formatted data packet
+char g_mqtt_json_topic[50];           // MQTT topic for reporting the decoded reading
+char g_json_message_buffer[512];      // MQTT JSON data for reporting JSON format
 
 // Wifi
 #define WIFI_CONNECT_INTERVAL          500   // Wait 500ms intervals for wifi connection
@@ -61,6 +51,8 @@ uint32_t g_device_id;                        // Unique ID from ESP chip ID
 /*--------------------------- Function Signatures ---------------------------*/
 bool initWifi();
 void reconnectMqtt();
+void callback(char* topic, byte* message, unsigned int length);
+void reportToMqtt();
 
 /*--------------------------- Instantiate Global Objects --------------------*/
 // MQTT
@@ -68,7 +60,13 @@ WiFiClient esp_client;
 PubSubClient client(esp_client);
 SoftwareSerial ut61e(UT61E_RX_PIN, -1); // RX, TX
 Adafruit_NeoPixel pixels(1, STATUS_LED_PIN, NEO_GRB + NEO_KHZ800);
-UT61E_MEAS dmm;
+
+// Passsing the serial object to the UT61E_DISP ctor enables debug output on the serial port.
+#ifdef DEBUG
+UT61E_DISP dmm(Serial);
+#else
+UT61E_DISP dmm;
+#endif // DEBUG
 
 /*--------------------------- Program ---------------------------------------*/
 /**
@@ -99,16 +97,17 @@ void setup()
   Serial.println(g_device_id, HEX);
 
   // Set up the topics for publishing sensor readings. By inserting the unique ID,
-  // the result is of the form: "device/d9616f/PM1P0" etc
-  sprintf(g_command_topic,        "cmnd/%X/COMMAND",   g_device_id);  // For receiving commands
-  sprintf(g_mqtt_raw_topic,       "tele/%X/RAW",       g_device_id);  // Data from multimeter
-  sprintf(g_mqtt_json_topic,      "tele/%X/JSON",      g_device_id);  // Data from multimeter
+  // the result is of the form: "device/d9616f/RAW" etc
+  sprintf(g_command_topic,            "cmnd/%X/COMMAND",   g_device_id);  // For receiving commands
+  sprintf(g_mqtt_raw_topic,           "tele/%X/RAW",       g_device_id);  // Data from multimeter
+  sprintf(g_mqtt_json_topic,          "tele/%X/JSON",      g_device_id);  // Data from multimeter
 
   // Report the MQTT topics to the serial console
+  Serial.println("MQTT command topics:");
   Serial.println(g_command_topic);       // For receiving messages
   Serial.println("MQTT topics:");
-  Serial.println(g_mqtt_raw_topic);      // From PMS
-  Serial.println(g_mqtt_json_topic);     // From PMS
+  Serial.println(g_mqtt_raw_topic);               // From PMS
+  Serial.println(g_mqtt_json_topic);              // From PMS
 
   // Connect to WiFi
   if (initWifi())
@@ -142,59 +141,97 @@ void loop() {
   if (ut61e.available())
   {
     byte this_character = ut61e.read();
-    //Serial.write(this_character);
-    g_mqtt_message_buffer[g_buffer_position] = this_character;
+    g_raw_packet_buffer[g_buffer_position] = this_character;
     g_buffer_position++;
-    if((13 == g_mqtt_message_buffer[g_buffer_position-2]) && (10 == g_mqtt_message_buffer[g_buffer_position-1]) ) {
-      if(dmm.check(g_mqtt_message_buffer)) {
+    if((13 == g_raw_packet_buffer[g_buffer_position-2]) && (10 == g_raw_packet_buffer[g_buffer_position-1]) ) {
+      // Copy only the data for parsing
+      strncpy(g_packet_buffer,g_raw_packet_buffer,12);
+      // If we successfully parse the packet, send it to the various destinations
+      if(dmm.parse(g_packet_buffer)) {
+        // Turn on LED to flash for each good packet we process
         pixels.setPixelColor(0, pixels.Color(0, 255, 0));  // Green
         pixels.show();
-        g_mqtt_message_buffer[g_buffer_position-2] = 0;
+
+        // Truncate the raw packet buffer to suit being printed as a string
+        g_raw_packet_buffer[g_buffer_position-2] = 0;
+
+        // Reset index for the next packet
         g_buffer_position = 0;
-        client.publish(g_mqtt_raw_topic, g_mqtt_message_buffer);
-        Serial.println(g_mqtt_message_buffer);
+
+        // Publish a raw packet to MQTT
+        client.publish(g_mqtt_raw_topic, g_raw_packet_buffer);
+
+        // Echo to serial port
+        Serial.println(g_raw_packet_buffer);
+
+        // Now turn off LED
         pixels.setPixelColor(0, pixels.Color(0, 0, 0));  // Off
         pixels.show();
-        dmm.parse(g_mqtt_message_buffer);
-        if (!dmm.hold)
-        {
-          // Strictly Jon's definition
-// The parsed values are published as a unified JSON message containing
-// various fields. The fields are:
 
-//  * value (float): the measured value, including sign if the value is negative.
-//  * currentType (string): ?
-//  * unit (string): the units for the measured value.
-//  * absValue (float): the absolute value of the latest measurement, with no sign.
-//  * negative (boolean): whether the measured value is negative.
-// {
-//   "currentType":"AC",
-//   "unit":"V",
-//   "value":-24.318,
-//   "absValue":"24.419",
-//   "negative":true
-// }
+        // When in 'HOLD' mode, the DMM continues to transmit 
+        // what it's reading and not what is on the display
+        // So we don't send any further JSON until this changes
+        if (!dmm.hold)         
+        { 
+         /* 
+          * The parsed values are published as a unified JSON message containing
+          * various fields. The fields are:
+          * value: Floating point actual value of reading. No multipliers. eg 1000 Ω not 1.000 kΩ
+          * unit: One of V,A,Ω,Hz,F,deg,% with no prefix
+          * display_value: Numerical value of the display digits. e.g 1 for when 1 kΩ or 220 for 220uF
+          * display_unit: One of V,A,Ω,Hz,F,deg,% with multiplier prefix such as M,k,m,u,n
+          * mode: Function selector mode. One of "voltage", "current", "resistance", "continuity",
+          *       "diode", "frequency", "capacitance", or  "temperature"
+          * currentType: "AC" or "DC"
+          * peak: Peak measurement mode one of "min" or "max"
+          * relative: In relative mode true or false
+          * hold: In hold mode true or false
+          * range: Range operation "manual" or "auto"
+          * operation: "Normal", "overload" or "underload"
+          * battery_low: true or false
+          * sign: Negative sign on, true or false
+          */
 
-          sprintf(g_json_message_buffer,"{\"currentType\":\"%s\",\"unit\":\"%s\",\"value\":%.4f,\"absValue\":\"%.4f\",\"negative\":%s}",
-          dmm.getPower(), dmm.getMode(), dmm.value, abs(dmm.value), dmm.value<0?"true":"false");
-          Serial.print("Squirrel JSON: ");
-          Serial.println(g_json_message_buffer);
-          // Official @superhousetv JSON spec.
-          client.publish(g_mqtt_json_topic, g_json_message_buffer);
+          // Temp var to create display of correct length string in
+          char _display_value[16];
 
-          // Everything we've got
-          sprintf(g_json_message_buffer,"{\"sampleNumber\":\"%lu\",\"value\":\"%.5f\",\"valueMax\":\"%.5f\",\"valueMin\":\"%.5f\",\"valueAverage\":\"%.5f\",\"mode\":\"%s\",\"currentType\":\"%s\",\"range\":\"%s\",\"frequencyMode\":\"%s\"}", dmm.sample, dmm.value, dmm.max , dmm.min, dmm.average , dmm.getMode() , dmm.getPower(),dmm.getRange(),dmm.getFMode());
+          // Print only the first 7 (or 8 if there is a negative sign) to the output string
+          // 7 Digits is 5 digit places, decimal point and string terminator null
+          // snprintf(_value, dmm.sign?8:7, "%f", dmm.value);
+          snprintf(_display_value, dmm.sign?8:7, "%f", dmm.display_value);
+
+          sprintf(g_json_message_buffer,"{\"value\":%f,\"unit\":\"%s\",\"display_value\":%s,\"display_unit\":\"%s\",\"display_string\":\"%s\",\"mode\":\"%s\",\"currentType\":\"%s\",\"peak\":\"%s\",\"relative\":%s,\"hold\":%s,\"range\":\"%s\",\"operation\":\"%s\",\"battery_low\":%s,\"negative\":%s}",
+           dmm.value,
+           dmm.unit.c_str(),
+           _display_value,
+           dmm.display_unit.c_str(),
+           dmm.display_string,
+           dmm.mode.c_str(),
+           dmm.currentType.c_str(),
+           dmm.peak.c_str(),
+           dmm.relative?"true":"false",
+           dmm.hold?"true":"false",
+           dmm.mrange.c_str(),
+           dmm.operation.c_str(),
+           dmm.battery_low?"true":"false",
+           dmm.sign?"true":"false");
+
+          size_t msg_length = strlen(g_json_message_buffer);
+
           Serial.print("JSON: ");
           Serial.println(g_json_message_buffer);
-          // Don't publish this - Aaron Knox's NR code will barf
-          // client.publish(g_mqtt_json_topic, g_json_message_buffer);
+          client.beginPublish(g_mqtt_json_topic, msg_length,false);
+          client.print(g_json_message_buffer);
+          client.endPublish();
         }
       } else { // Data error
         pixels.setPixelColor(0, pixels.Color(255, 0, 0));  // Red
         pixels.show();
         g_buffer_position = 0;
-        client.publish(g_mqtt_raw_topic, g_mqtt_message_buffer);
+        client.publish(g_mqtt_raw_topic, g_raw_packet_buffer);
         sprintf(g_json_message_buffer,"{\"error\":\"invalid data!\"}");
+        Serial.print("JSON: ");
+        Serial.println(g_json_message_buffer);
         pixels.setPixelColor(0, pixels.Color(0, 0, 0));  // Off
         pixels.show();
       }
@@ -209,6 +246,9 @@ void loop() {
 void reportToMqtt()
 {
   String message_string;
+
+// Not currently used. Left over from Jon's original code.
+// long buffer publish mechanism is currenlty implemented.
 
   /* Report all values combined into one JSON message */
   // Note: The PubSubClient library limits MQTT message size to 128 bytes, which is
@@ -227,9 +267,9 @@ void reportToMqtt()
   //    pms_data.pm10_env, pms_data.pm25_env, pms_data.pm100_env,
   //    pms_data.particles_03um, pms_data.particles_05um, pms_data.particles_10um, pms_data.particles_25um, pms_data.particles_50um, pms_data.particles_100um);
   /*
-    sprintf(g_mqtt_message_buffer,  "{\"UT61E\":{\"RANGE\":%i,\"VALUE\":%i}}",
+    sprintf(g_raw_packet_buffer,  "{\"UT61E\":{\"RANGE\":%i,\"VALUE\":%i}}",
             g_ut61e_range, g_ut61e_value);
-    client.publish(g_mqtt_json_topic, g_mqtt_message_buffer);
+    client.publish(g_mqtt_json_topic, g_raw_packet_buffer);
   */
 }
 
@@ -285,8 +325,8 @@ void reconnectMqtt() {
     if (client.connect(mqtt_client_id, mqtt_username, mqtt_password))
     {
       // Once connected, publish an announcement
-      sprintf(g_mqtt_message_buffer, "Device %s starting up", mqtt_client_id);
-      client.publish(status_topic, g_mqtt_message_buffer);
+      sprintf(g_raw_packet_buffer, "Device %s starting up", mqtt_client_id);
+      client.publish(status_topic, g_raw_packet_buffer);
       pixels.setPixelColor(0, pixels.Color(0, 50, 0));  // Dim green
       pixels.show();
       // Resubscribe
