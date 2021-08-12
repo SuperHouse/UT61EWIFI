@@ -370,17 +370,17 @@ bool UT61E_DISP::_parse()
     else
         hold = false;
 
-    if (options["MAX"])
+    if (options["PMAX"])
     {
-        peak = "max";
+        peak = "Pmax";
         if (serial)
-            serial->printf("{MAX : %d}", options["MAX"]);
+            serial->printf("{PMAX : %d}", options["PMAX"]);
     }
-    else if (options["MIN"])
+    else if (options["PMIN"])
     {
-        peak = "min";
+        peak = "Pmin";
         if (serial)
-            serial->printf("{MIN : %d}", options["MIN"]);
+            serial->printf("{PMIN : %d}", options["PMIN"]);
     }
     else
         peak = "";
