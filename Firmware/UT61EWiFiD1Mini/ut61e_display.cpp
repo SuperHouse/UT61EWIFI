@@ -370,17 +370,17 @@ bool UT61E_DISP::_parse()
     else
         hold = false;
 
-    if (options["MAX"])
+    if (options["PMAX"])
     {
-        peak = "max";
+        peak = "Pmax";
         if (serial)
-            serial->printf("{MAX : %d}", options["MAX"]);
+            serial->printf("{PMAX : %d}", options["PMAX"]);
     }
-    else if (options["MIN"])
+    else if (options["PMIN"])
     {
-        peak = "min";
+        peak = "Pmin";
         if (serial)
-            serial->printf("{MIN : %d}", options["MIN"]);
+            serial->printf("{PMIN : %d}", options["PMIN"]);
     }
     else
         peak = "";
@@ -409,18 +409,18 @@ bool UT61E_DISP::_parse()
     vector<int> digit_array = {d0, d1, d2, d3, d4};
 
     // Do some hokery pokery and move the dp into position
-    sprintf(display_string, ".%1d%1d%1d%1d%1d", d4, d3, d2, d1, d0);
+    sprintf(display_digits, ".%1d%1d%1d%1d%1d", d4, d3, d2, d1, d0);
     for (int i = 0; i < (5 - m_range.dp_digit_position); i++)
     {
-        display_string[i] = display_string[i + 1];
-        display_string[i + 1] = '.';
+        display_digits[i] = display_digits[i + 1];
+        display_digits[i + 1] = '.';
     }
 
     // Strip leading zeroes from the string
     for (int i = 0; i < 6; i++)
     {
-        if(display_string[i] == '0' && display_string[i + 1] != '.')
-            display_string[i] = ' ';
+        if(display_digits[i] == '0' && display_digits[i + 1] != '.')
+            display_digits[i] = ' ';
         else
             break;
     }
@@ -428,21 +428,26 @@ bool UT61E_DISP::_parse()
     if (serial)
     {
         serial->printf("{dp_position : %d}", m_range.dp_digit_position);
-        serial->printf("{display_string : %s}", display_string);
+        serial->printf("{display_digits : %s}", display_digits);
     }
     display_value = 0;
     for (int i = 0; i < 5; i++)
         display_value += digit_array[i] * pow(10, i);
+
+    // Set the decimal place in the display value
+    display_value = display_value / pow(10, m_range.dp_digit_position);
+
+    string _display_string = display_digits;
+    strcpy(display_string,_display_string.substr(_display_string.find_first_not_of(' ')).c_str());
+
     if (options["SIGN"])
     {
         display_value = -display_value;
         sign = true;
     }
     else
-    {
         sign = false;
-    }
-    display_value = display_value / pow(10, m_range.dp_digit_position);
+
     display_unit = m_range.display_unit;
     value = float(display_value) * m_range.value_multiplier;
 
@@ -451,9 +456,15 @@ bool UT61E_DISP::_parse()
         display_value = 0;
         value = 0;
         if(operation == "overload")
-            sprintf(display_string," 0L.  ");
-        if(operation == "underload")
-            sprintf(display_string," UL.  ");
+        {
+            sprintf(display_digits," OL.  ");
+            strcpy(display_string,"OL.");
+        }
+        if (operation == "underload")
+        {
+            sprintf(display_digits, " UL.  ");
+            strcpy(display_string,"UL.");
+        }
         if (serial)
             serial->println(operation.c_str());
     }

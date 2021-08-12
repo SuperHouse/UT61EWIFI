@@ -14,8 +14,8 @@
     - "NeoPixel" by Adafruit
 
 */
-#define VERSION "2.1"
-// #define DEBUG
+#define VERSION "2.2"
+#define DEBUG
 
 /*--------------------------- Configuration ------------------------------*/
 // Configuration should be done in the included file:
@@ -67,6 +67,9 @@ UT61E_DISP dmm(Serial);
 #else
 UT61E_DISP dmm;
 #endif // DEBUG
+
+// In hold state
+boolean _held = false;
 
 /*--------------------------- Program ---------------------------------------*/
 /**
@@ -171,40 +174,26 @@ void loop() {
         // When in 'HOLD' mode, the DMM continues to transmit 
         // what it's reading and not what is on the display
         // So we don't send any further JSON until this changes
-        if (!dmm.hold)         
+        if (!(_held && dmm.hold))         
         { 
          /* 
           * The parsed values are published as a unified JSON message containing
-          * various fields. The fields are:
-          * value: Floating point actual value of reading. No multipliers. eg 1000 Ω not 1.000 kΩ
-          * unit: One of V,A,Ω,Hz,F,deg,% with no prefix
-          * display_value: Numerical value of the display digits. e.g 1 for when 1 kΩ or 220 for 220uF
-          * display_unit: One of V,A,Ω,Hz,F,deg,% with multiplier prefix such as M,k,m,u,n
-          * mode: Function selector mode. One of "voltage", "current", "resistance", "continuity",
-          *       "diode", "frequency", "capacitance", or  "temperature"
-          * currentType: "AC" or "DC"
-          * peak: Peak measurement mode one of "min" or "max"
-          * relative: In relative mode true or false
-          * hold: In hold mode true or false
-          * range: Range operation "manual" or "auto"
-          * operation: "Normal", "overload" or "underload"
-          * battery_low: true or false
-          * sign: Negative sign on, true or false
+          * all available fields. See README.md for details.
           */
 
-          // Temp var to create display of correct length string in
+          // Temp var in which to create display of correct length
           char _display_value[16];
 
           // Print only the first 7 (or 8 if there is a negative sign) to the output string
           // 7 Digits is 5 digit places, decimal point and string terminator null
-          // snprintf(_value, dmm.sign?8:7, "%f", dmm.value);
           snprintf(_display_value, dmm.sign?8:7, "%f", dmm.display_value);
 
-          sprintf(g_json_message_buffer,"{\"value\":%f,\"unit\":\"%s\",\"display_value\":%s,\"display_unit\":\"%s\",\"display_string\":\"%s\",\"mode\":\"%s\",\"currentType\":\"%s\",\"peak\":\"%s\",\"relative\":%s,\"hold\":%s,\"range\":\"%s\",\"operation\":\"%s\",\"battery_low\":%s,\"negative\":%s}",
+          sprintf(g_json_message_buffer,"{\"value\":%f,\"unit\":\"%s\",\"display_value\":%s,\"display_unit\":\"%s\",\"display_digits\":\"%s\",\"display_string\":\"%s\",\"mode\":\"%s\",\"currentType\":\"%s\",\"peak\":\"%s\",\"relative\":%s,\"hold\":%s,\"range\":\"%s\",\"operation\":\"%s\",\"battery_low\":%s,\"negative\":%s}",
            dmm.value,
            dmm.unit.c_str(),
            _display_value,
            dmm.display_unit.c_str(),
+           dmm.display_digits,
            dmm.display_string,
            dmm.mode.c_str(),
            dmm.currentType.c_str(),
@@ -223,8 +212,16 @@ void loop() {
           client.beginPublish(g_mqtt_json_topic, msg_length,false);
           client.print(g_json_message_buffer);
           client.endPublish();
-        }
-      } else { // Data error
+
+          if(dmm.hold)
+            _held = true;
+          else
+            _held = false;
+
+        } // if(!dmm.hold)
+      }
+      else
+      { // parse returned false - data error
         pixels.setPixelColor(0, pixels.Color(255, 0, 0));  // Red
         pixels.show();
         g_buffer_position = 0;
@@ -238,7 +235,6 @@ void loop() {
     }
   }
 }
-
 
 /**
   Report the most recent values to MQTT if enough time has passed
