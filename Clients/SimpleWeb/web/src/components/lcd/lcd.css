@@ -1,0 +1,135 @@
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+}
+
+.lcd {
+  margin: 0;
+  padding: 4vw 2.5vw 2vw 2.5vw;
+}
+
+.monospace {
+  font-family: "Roboto Mono", monospace;
+}
+
+.D7MBI {
+  font-family: "D7MBI", "Roboto Mono", monospace;
+}
+
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 0 2vw 0;
+}
+
+.header__display_unit {
+  width: 16vw;
+  height: auto;
+}
+
+.header__ut16e {
+  width: 16vw;
+  height: auto;
+}
+
+.Meter-Wrapper {
+  position: relative;
+  height: 50vw;
+  padding: 2.5vw 4vw 5vw 4vw;
+  border-radius: 2.5vw;
+  background-color: #252525;
+  box-shadow: 0.4vw 0.4vw 0.1vw 0 rgba(0, 0, 0, 0.1) inset;
+}
+.Meter-Wrapper.c-level {
+  background-color: #c21717;
+}
+
+.Meter-Wrapper__inner {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.Meter-Top-Bar {
+  font-size: 6vw;
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.Meter-Top-Bar__left,
+.Meter-Top-Bar__right {
+  position: relative;
+  min-width: 20%;
+  display: block;
+}
+
+.Meter-Top-Bar__right {
+  text-align: right;
+}
+
+.Meter-Top-Bar__centre {
+  margin: 0 auto;
+  display: flex;
+  align-content: center;
+  align-items: center;
+}
+
+.Meter-Top-Bar__centre svg {
+  width: auto;
+  height: 8vw;
+  margin: 0 1vw;
+  opacity: 0.07;
+}
+
+.Meter-Value {
+  position: relative;
+  font-size: 17vw;
+  align-self: center;
+}
+
+.Meter-Value:before {
+  content: "888888";
+  color: rgba(0, 0, 0, 0.07);
+  display: block;
+}
+
+.Meter-Value span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.Meter-Range {
+  font-size: 5vw;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+#low-battery {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: auto;
+  height: 8vw;
+  opacity: 0;
+}
+
+.logo-superhouse {
+  width: 40%;
+  height: auto;
+  margin: 0 auto;
+  display: block;
+}
+
+.hide-item {
+  opacity: 0 !important;
+}
+.full-item {
+  opacity: 1 !important;
+}

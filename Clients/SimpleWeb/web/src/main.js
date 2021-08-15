@@ -3,8 +3,8 @@ import {
 } from 'vue'
 import App from './App.vue'
 import mitt from 'mitt';
-import wsService from './services/wsService'
-import ut61E from './services/ut61E'
+import wsService from './services/wsService';
+import ut61E from './services/ut61E';
 const emitter = mitt();
 
 const app = createApp(App);

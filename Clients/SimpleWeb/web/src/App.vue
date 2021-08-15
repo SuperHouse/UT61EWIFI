@@ -1,16 +1,21 @@
 <template>
-  <lcd />
+  <div>
+    <lcd />
+    <liveGraph />
+  </div>
 </template>
 
 <script>
-import lcd from './components/lcd.vue'
+import lcd from "./components/lcd/lcd.vue";
+import liveGraph from "./components/live-graph/graph.vue";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
-    lcd
-  }
-}
+    lcd,
+    liveGraph,
+  },
+};
 </script>
 
 <style>
@@ -19,6 +24,7 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
+  color: #ffffff;
+  background-color: #333333;
 }
 </style>

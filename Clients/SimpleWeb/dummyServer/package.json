@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",
+    "mqtt": "^4.2.8",
     "ws": "^8.1.0"
   }
 }

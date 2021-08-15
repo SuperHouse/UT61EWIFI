@@ -25,11 +25,11 @@ export default {
         ok: false
       };
       if (this.operationalState == 1) return {
-        text: "0VER!L",
+        text: "0L.!!",
         ok: false
       };
       if (this.operationalState == -1) return {
-        text: "UNDR!L",
+        text: "VL.!!",
         ok: false
       };
       let fixedVal = this.displayStringRequiredLength;
@@ -67,25 +67,48 @@ export default {
       operationalState: 0
     };
   },
+  methods: {
+    updateData(name, value) {
+      if (name === "onHold") {
+        this.onHold = value;
+        return true;
+      }
+      if (this.onHold) return false;
+      this[name] = value;
+      return true;
+    }
+  },
+  beforeDestroy() {
+    this.eventBus.off("ws-boot");
+    this.eventBus.off("ws-state");
+    this.eventBus.off("ws-current-type");
+    this.eventBus.off("ws-operation");
+    this.eventBus.off("ws-hold");
+    this.eventBus.off("ws-batt-low");
+    this.eventBus.off("ws-unit");
+    this.eventBus.off("ws-mode");
+    this.eventBus.off("ws-range");
+    this.eventBus.off("ws-value");
+  },
   mounted() {
     const self = this;
     this.eventBus.on("ws-boot", () => self.isBooted = true);
     this.eventBus.on("ws-state", state => self.isConnected = state);
 
-    this.eventBus.on("e-current-type", cType => self.currentType = self.onHold ? self.currentType : cType);
-    this.eventBus.on("e-operation", operation => self.operationalState = operation);
-    this.eventBus.on("e-hold", hold => self.onHold = hold);
-    this.eventBus.on("e-batt-low", lowBattery => self.lowBattery = lowBattery);
-    this.eventBus.on("e-unit", unit => self.displayUnit = self.onHold ? self.displayUnit : unit);
-    this.eventBus.on("e-mode", mode => self.mode = self.onHold ? self.mode : mode);
-    this.eventBus.on("e-range", range => self.range = self.onHold ? self.range : range);
+    this.eventBus.on("e-current-type", cType => self.updateData('currentType', cType));
+    this.eventBus.on("e-operation", operation => self.updateData('operationalState', operation));
+    this.eventBus.on("e-hold", hold => self.updateData('onHold', hold));
+    this.eventBus.on("e-batt-low", lowBattery => self.updateData('lowBattery', lowBattery));
+    this.eventBus.on("e-unit", unit => self.updateData('displayUnit', unit));
+    this.eventBus.on("e-mode", mode => self.updateData('mode', mode));
+    this.eventBus.on("e-range", range => self.updateData('range', range));
     this.eventBus.on("e-value", value => {
-      if (self.onHold) return;
-      self.negative = (value < 0);
+      let canUpdate = self.updateData('negative', (value < 0));
+      if (!canUpdate) return;
       if (self.negative) {
         value = value * -1;
       }
-      self.value = value;
+      self.updateData('value', value);
     });
   }
 };
