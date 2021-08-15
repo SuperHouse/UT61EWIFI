@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 const WS_URLS = [
   `wss://${location.host}/endpoint`,
   `ws://${location.host}/endpoint`,
@@ -14,7 +12,7 @@ let serverConnectionTo = null;
 let WS_SERVER;
 
 export default {
-  install(Vue) { // eslint-disable-line no-unused-vars
+  install(Vue) {
     Vue.$eventBus.emit("ws-state", false);
     const connectToServer = () => {
       console.log('CONNECT TO: ' + serverConnectionTo);

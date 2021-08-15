@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "apexcharts": "^3.27.3",
+    "cookies-js": "^1.2.3",
     "core-js": "^3.6.5",
     "install": "^0.13.0",
     "mitt": "^3.0.0",

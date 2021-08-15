@@ -2,11 +2,13 @@
   <div>
     <lcd />
     <liveGraph />
+    <theme />
   </div>
 </template>
 
 <script>
 import lcd from "./components/lcd/lcd.vue";
+import theme from "./components/theme/theme.vue";
 import liveGraph from "./components/live-graph/graph.vue";
 
 export default {
@@ -14,7 +16,12 @@ export default {
   components: {
     lcd,
     liveGraph,
+    theme,
   },
+  created () {
+
+    console.log(this.$themes)
+  }
 };
 </script>
 
