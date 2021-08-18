@@ -8,7 +8,7 @@ npm i -g @vue/cli
 ## Project base
 change into the simpleweb working dir
 ```
-cd ./Clients/SimpleWeb/ 
+cd ./Clients/SimpleWeb/web
 ```
 
 ## Project setup
