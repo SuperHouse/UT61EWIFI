@@ -31,7 +31,7 @@ jobs:
 
       # Clients - Node-RED
       - run: |
-          cd ./Clients/Node-Red;
+          cd ./Clients/Node-RED;
           node build.js;
           mkdir dist;
           cd dist;
@@ -54,4 +54,4 @@ jobs:
           prerelease: false
           title: "SimpleWeb Node-RED Client"
           files: |
-            Clients/Node-Red/dist/*.tar.gz
+            Clients/Node-RED/dist/*.tar.gz
