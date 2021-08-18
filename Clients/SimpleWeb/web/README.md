@@ -1,5 +1,16 @@
 # simple-web
 
+## PC setup
+```
+npm i -g @vue/cli
+```
+
+## Project base
+change into the simpleweb working dir
+```
+cd ./Clients/SimpleWeb/ 
+```
+
 ## Project setup
 ```
 npm install
