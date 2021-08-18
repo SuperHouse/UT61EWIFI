@@ -106,7 +106,7 @@ export default {
         newSeries.push(this.data[key])
       }
       let colours = '#222222,'.repeat(keys.length).split(',').filter(x => x === '' ? null : x);
-      colours[keys.indexOf(this.mode)] = '#ce1729';
+      colours[keys.indexOf(this.mode)] = this.$theme.primary;
       this.$data.chartOptions.colors = colours;
 
       if (this.$refs.chart === null)

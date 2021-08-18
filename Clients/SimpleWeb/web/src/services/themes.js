@@ -16,17 +16,17 @@ const themes = [{
   }
 }, {
   name: 'default',
-  primary: 'white',
+  primary: '#502bfe',
   secondary: '#888888',
   lcd: {
-    hold: 'white',
-    bgAlert: 'purple',
-    bg: 'yellow',
+    hold: 'black',
+    bgAlert: 'black',
+    bg: '#502bfe',
     alt: 'black',
-    active: 'red',
-    unit: 'purple',
-    range: 'purple',
-    text: 'purple',
+    active: 'black',
+    unit: 'black',
+    range: 'black',
+    text: 'black',
   }
 }];
 

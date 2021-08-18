@@ -6,7 +6,7 @@
         target="_blank"
       >
         <img
-          :src="`data:image/png;base64,${utlogo}`"
+          :src="`data:image/png;base64,${$srcs.utlogo}`"
           alt=""
           class="header__unit"
         />
@@ -16,7 +16,7 @@
         target="_blank"
       >
         <img
-          :src="`data:image/png;base64,${uttext}`"
+          :src="`data:image/png;base64,${$srcs.uttext}`"
           alt=""
           class="header__ut16e"
         />
@@ -32,7 +32,8 @@
     >
       <div class="Meter-Wrapper__inner">
         <div class="Meter-Top-Bar monospace">
-          <div :class="`Meter-Top-Bar__left ${isConnected ? '' : 'hide-item'}`">
+          <div :class="`Meter-Top-Bar__left ${isConnected ? '' : 'hide-item'}`"
+            :style="`color: ${$theme.lcd.unit}`">
             {{ currentType }}
           </div>
           <div
@@ -269,13 +270,6 @@
             :fill="lowBattery ? '#ce1729' : $theme.lcd.alt"
           />
         </svg>
-        <a href="https://www.superhouse.tv/" target="_blank">
-          <img
-            class="logo-superhouse"
-            :src="`data:image/png;base64,${logo}`"
-            alt=""
-          />
-        </a>
       </div>
     </div>
   </div>

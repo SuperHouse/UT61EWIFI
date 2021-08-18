@@ -1,5 +1,3 @@
-import utSrc from './lcd-src';
-
 export default {
   computed: {
     displayStringRequiredLength() {
@@ -48,10 +46,6 @@ export default {
     return {
       defaultLCDLength: 6,
       negLCDLength: 5,
-
-      logo: utSrc.logo,
-      utlogo: utSrc.utlogo,
-      uttext: utSrc.uttext,
 
       isBooted: false,
       isConnected: false,
