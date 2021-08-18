@@ -47,5 +47,5 @@ console.log('Found template file... deploying');
 nodeRedCode[keyIndex].template = htmlTemplate.replace('"', '\"');
 
 fs.writeFileSync(nodeRedJsonFile, JSON.stringify(nodeRedCode))
-fs.writeFileSync(nodeRedJsonFile+'.html', htmlTemplate)
+
 console.log('Found template file... complete');

@@ -35,7 +35,7 @@ jobs:
           node build.js;
           mkdir dist;
           cd dist;
-          cp ../../License/* ./;
+          cp ../../../License/* ./;
           tar -czvf SimpleWeb-NodeRED.tar.gz ../*.json;
 
       - uses: "marvinpinto/action-automatic-releases@latest"
