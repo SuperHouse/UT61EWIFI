@@ -25,6 +25,18 @@ jobs:
           cd ./Clients/SimpleWeb/web;
           npm ci;
           npm run build;
+          cd ./dist;
+          cp ../../../../License/* ./;
+          tar -czvf SimpleWeb.tar.gz ./*;
+
+      # Clients - Node-RED
+      - run: |
+          cd ./Clients/Node-Red;
+          node build.js;
+          mkdir dist;
+          cd dist;
+          cp ../../License/* ./;
+          tar -czvf SimpleWeb-NodeRED.tar.gz ../*.json;
 
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -33,5 +45,5 @@ jobs:
           prerelease: false
           title: "SimpleWeb Client"
           files: |
-            License/*
-            Clients/SimpleWeb/web/dist/*
+            Clients/Node-Red/dist/*.tar.gz
+            Clients/SimpleWeb/web/dist/*.tar.gz

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SuperHouse | UT61e UI</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+  {{CSS}}
+  <script type="text/javascript">
+    let nrWSHost = "ws://<% payload.nrHost %>";
+    if (location.protocol == "https:") {
+      nrWSHost = "wss://<% payload.nrHost %>"
+    }
+    let haAddon = "<% payload.haAddon %>"
+    if (haAddon == "true") {
+      nrWSHost += "/endpoint"
+    }
+    window._customWSHost = nrWSHost;
+  </script>
+</head>
+
+<body><noscript><strong>We're sorry but SuperHouse | UT61e UI doesn't work properly without JavaScript enabled. Please
+      enable it to continue.</strong></noscript>
+  <div id="app"></div>
+  {{JAVASCRIPT}}
+</body>
+
+</html>

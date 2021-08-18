@@ -3,8 +3,8 @@ const WS_URLS = [
   `ws://${location.host}/endpoint`,
   `wss://${location.host}/`,
   `ws://${location.host}/`,
-  'ws://localhost:8999/'
-];
+  window._customWSHost || 'ws://localhost:8999/'
+].concat(window._customWSHosts || []);
 
 let serverConnected = false;
 let serverConnectionTo = null;

@@ -30,3 +30,7 @@ jobs:
           cd ./Clients/SimpleWeb/web;
           npm ci;
           npm run build;
+      # Clients - Node-RED
+      - run: |
+          cd ./Clients/Node-Red;
+          node build.js;
