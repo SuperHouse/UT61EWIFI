@@ -27,7 +27,7 @@ jobs:
           npm run build;
           cd ./dist;
           cp ../../../../License/* ./;
-          tar -czvf SimpleWeb.tar.gz ./*;
+          tar -czvf SimpleWeb-WebUI.tar.gz ./*;
 
       # Clients - Node-RED
       - run: |
@@ -43,15 +43,7 @@ jobs:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           automatic_release_tag: "latest"
           prerelease: false
-          title: "SimpleWeb Client"
+          title: "Clients"
           files: |
             Clients/SimpleWeb/web/dist/*.tar.gz
-
-      - uses: "marvinpinto/action-automatic-releases@latest"
-        with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "latest"
-          prerelease: false
-          title: "SimpleWeb Node-RED Client"
-          files: |
             Clients/Node-RED/dist/*.tar.gz
