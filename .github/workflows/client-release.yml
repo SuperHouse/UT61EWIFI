@@ -45,5 +45,13 @@ jobs:
           prerelease: false
           title: "SimpleWeb Client"
           files: |
-            Clients/Node-Red/dist/*.tar.gz
             Clients/SimpleWeb/web/dist/*.tar.gz
+
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: false
+          title: "SimpleWeb Node-RED Client"
+          files: |
+            Clients/Node-Red/dist/*.tar.gz
