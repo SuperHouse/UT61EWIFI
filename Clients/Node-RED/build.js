@@ -40,12 +40,18 @@ for (let file of jsFiles) {
 }
 
 let htmlTemplate = fs.readFileSync(path.join(cwd, './build.template.html'), 'utf8');
-htmlTemplate = htmlTemplate.replace('{{CSS}}', cssFileContents.join('\n'));
-htmlTemplate = htmlTemplate.replace('{{JAVASCRIPT}}', jsFileContents.join('\n'));
+
+const cssKey = '--CSS--';
+const cssIndex = htmlTemplate.indexOf(cssKey);
+htmlTemplate = htmlTemplate.substring(0, cssIndex) + cssFileContents.join('\n') + htmlTemplate.substring(cssIndex + cssKey.length);
+
+const jsKey = '--JAVASCRIPT--';
+const jsIndex = htmlTemplate.indexOf(jsKey);
+htmlTemplate = htmlTemplate.substring(0, jsIndex) + jsFileContents.join('\n') + htmlTemplate.substring(jsIndex + jsKey.length);
 
 console.log('Found template file... deploying');
-nodeRedCode[keyIndex].template = htmlTemplate.replace('"', '\"');
+nodeRedCode[keyIndex].template = '{{=<% %>=}}' + htmlTemplate.replace('"', '\"');
 
-fs.writeFileSync(nodeRedJsonFile, JSON.stringify(nodeRedCode))
+fs.writeFileSync(nodeRedJsonFile, JSON.stringify(nodeRedCode));
 
 console.log('Found template file... complete');

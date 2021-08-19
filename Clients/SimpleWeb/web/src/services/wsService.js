@@ -66,23 +66,29 @@ export default {
         }
       };
       WS_URLS.forEach(x => {
-        let tWS = new WebSocket(x);
-        wsServers.push({
-          url: x,
-          ws: tWS
-        });
-        tWS.onopen = () => {
-          serverConnectionTo = x;
-          closeAllServers();
-        };
-        tWS.onclose = () => {
-          for (let i = 0; i < wsServers.length; i++) {
-            if (wsServers[i].url === x) {
-              wsServers.splice(i, 1);
-              return;
+        console.log(`Try WS Connect to ${x}`);
+        try {
+          let tWS = new WebSocket(x);
+          wsServers.push({
+            url: x,
+            ws: tWS
+          });
+          tWS.onopen = () => {
+            serverConnectionTo = x;
+            closeAllServers();
+          };
+          tWS.onclose = () => {
+            for (let i = 0; i < wsServers.length; i++) {
+              if (wsServers[i].url === x) {
+                wsServers.splice(i, 1);
+                return;
+              }
             }
-          }
-        };
+          };
+        } catch (xc) {
+          console.error(`Error WS Connect to ${x}`);
+          console.error(xc)
+        }
       })
       setTimeout(() => {
         if (serverConnectionTo === null)

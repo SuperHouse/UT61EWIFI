@@ -12,8 +12,9 @@
       padding: 0;
     }
   </style>
-  {{CSS}}
+  --CSS--
   <script type="text/javascript">
+    if ("<% payload.nrHost %>" == "") return;
     let nrWSHost = "ws://<% payload.nrHost %>";
     if (location.protocol == "https:") {
       nrWSHost = "wss://<% payload.nrHost %>"
@@ -29,7 +30,7 @@
 <body><noscript><strong>We're sorry but SuperHouse | UT61e UI doesn't work properly without JavaScript enabled. Please
       enable it to continue.</strong></noscript>
   <div id="app"></div>
-  {{JAVASCRIPT}}
+  --JAVASCRIPT--
 </body>
 
 </html>
