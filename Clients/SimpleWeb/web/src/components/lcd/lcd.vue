@@ -25,15 +25,18 @@
     <div
       class="Meter-Wrapper"
       :style="`background-color: ${
-        (isBooted && !isConnected) || (mode === 'continuity' && value === 0)
+        (bootState == 2 && !isConnected) ||
+        (mode === 'continuity' && value === 0)
           ? $theme.lcd.bgAlert
           : $theme.lcd.bg
       }`"
     >
       <div class="Meter-Wrapper__inner">
         <div class="Meter-Top-Bar monospace">
-          <div :class="`Meter-Top-Bar__left ${isConnected ? '' : 'hide-item'}`"
-            :style="`color: ${$theme.lcd.unit}`">
+          <div
+            :class="`Meter-Top-Bar__left ${isConnected ? '' : 'hide-item'}`"
+            :style="`color: ${$theme.lcd.unit}`"
+          >
             {{ currentType }}
           </div>
           <div

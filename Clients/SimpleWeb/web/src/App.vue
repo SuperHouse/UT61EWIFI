@@ -7,6 +7,8 @@
     <router-link src="https://www.superhouse.tv/" target="_blank">
       <logo />
     </router-link>
+
+    <div @click="resetSession()">RESET SESSION</div>
   </div>
 </template>
 
@@ -15,6 +17,7 @@ import logo from "./components/logo/logo.vue";
 import lcd from "./components/lcd/lcd.vue";
 import theme from "./components/theme/theme.vue";
 import liveGraph from "./components/live-graph/graph.vue";
+import cookies from "cookies-js";
 
 export default {
   name: "App",
@@ -23,6 +26,13 @@ export default {
     lcd,
     liveGraph,
     theme,
+  },
+  methods: {
+    resetSession() {
+      cookies.expire("active-server");
+      cookies.expire("active-theme");
+      window.location.reload(true);
+    },
   },
   created() {
     console.log(this.$themes);

@@ -14,8 +14,16 @@ export default {
       return textUnfor.text;
     },
     displayStringUnformatted() {
-      if (!this.isBooted) return {
-        text: "SERVER",
+      if (this.bootState == -1) return {
+        text: "TEST",
+        ok: false
+      };
+      if (this.bootState == 0) return {
+        text: "WAIT 5",
+        ok: false
+      };
+      if (this.bootState == 1) return {
+        text: "READY",
         ok: false
       };
       if (!this.isConnected) return {
@@ -47,7 +55,7 @@ export default {
       defaultLCDLength: 6,
       negLCDLength: 5,
 
-      isBooted: false,
+      bootState: -1,
       isConnected: false,
 
       currentType: "DC",
@@ -86,7 +94,7 @@ export default {
   },
   mounted() {
     const self = this;
-    this.eventBus.on("ws-boot", () => self.isBooted = true);
+    this.eventBus.on("ws-boot", (x) => self.bootState = x);
     this.eventBus.on("ws-state", state => self.isConnected = state);
 
     this.eventBus.on("e-current-type", cType => self.updateData('currentType', cType));

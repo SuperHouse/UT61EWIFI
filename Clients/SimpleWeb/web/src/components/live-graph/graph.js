@@ -23,7 +23,7 @@ export default {
   },
   mounted() {
     const self = this;
-    this.eventBus.on("ws-boot", () => self.isBooted = true);
+    this.eventBus.on("ws-boot", (x) => self.bootState = x);
     this.eventBus.on("ws-state", state => {
       self.isConnected = state;
       if (state)
@@ -130,7 +130,7 @@ export default {
   data() {
     return {
       renderOk: true,
-      isBooted: false,
+      bootState: -1,
       isConnected: false,
       coreChangeItems: ['currentType', 'displayUnit', 'mode'],
       maxBackLength: 15,
