@@ -1,10 +1,14 @@
+let customHashUrl = `${window.location.hash}`;
+if (customHashUrl.length > 3)
+  window._customWSHost = customHashUrl.substring(1);
+
 const WS_URLS = [
   `wss://${location.host}/endpoint`,
   `ws://${location.host}/endpoint`,
   `wss://${location.host}/`,
   `ws://${location.host}/`,
   window._customWSHost || 'ws://localhost:8999/'
-].concat(window._customWSHosts || []);
+];
 
 let serverConnected = false;
 let serverConnectionTo = null;
