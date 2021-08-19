@@ -3,10 +3,10 @@ if (customHashUrl.length > 3)
   window._customWSHost = customHashUrl.substring(1);
 
 const WS_URLS = [
-  `wss://${location.host}/endpoint`,
-  `ws://${location.host}/endpoint`,
-  `wss://${location.host}/`,
-  `ws://${location.host}/`,
+  `wss://${location.host}/endpoint/websocket`,
+  `ws://${location.host}/endpoint/websocket`,
+  `wss://${location.host}/websocket`,
+  `ws://${location.host}/websocket`,
   window._customWSHost || 'ws://localhost:8999/'
 ];
 

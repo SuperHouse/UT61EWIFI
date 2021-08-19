@@ -14,14 +14,18 @@
   </style>
   --CSS--
   <script type="text/javascript">
-    if ("<% payload.nrHost %>" == "") return;
-    let nrWSHost = "ws://<% payload.nrHost %>";
+    let nrHost = "<% payload.nrHost %>" || window.location.host;
+    let nrWSHost = `ws://${nrHost}`;
     if (location.protocol == "https:") {
-      nrWSHost = "wss://<% payload.nrHost %>"
+      nrWSHost = `wss://${nrHost}`;
     }
     let haAddon = "<% payload.haAddon %>"
     if (haAddon == "true") {
       nrWSHost += "/endpoint"
+    }
+    let uiUrl = "<% payload.UI_URL %>"
+    if (uiUrl != "") {
+      nrWSHost += uiUrl
     }
     window._customWSHost = nrWSHost;
   </script>
