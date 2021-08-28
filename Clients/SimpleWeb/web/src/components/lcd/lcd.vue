@@ -25,7 +25,6 @@
     <div
       class="Meter-Wrapper"
       :style="`background-color: ${
-        (bootState == 2 && !isConnected) ||
         (mode === 'continuity' && value === 0)
           ? $theme.lcd.bgAlert
           : $theme.lcd.bg
@@ -34,14 +33,13 @@
       <div class="Meter-Wrapper__inner">
         <div class="Meter-Top-Bar monospace">
           <div
-            :class="`Meter-Top-Bar__left ${isConnected ? '' : 'hide-item'}`"
+            :class="`Meter-Top-Bar__left`"
             :style="`color: ${$theme.lcd.unit}`"
           >
             {{ currentType }}
           </div>
           <div
             class="Meter-Top-Bar__centre"
-            :class="isConnected ? '' : 'hide-item'"
           >
             <svg
               :class="onHold ? 'full-item' : ''"
@@ -115,7 +113,7 @@
             </svg>
           </div>
           <div
-            :class="`Meter-Top-Bar__right ${isConnected ? '' : 'hide-item'}`"
+            :class="`Meter-Top-Bar__right`"
             :style="`color: ${$theme.lcd.unit}`"
           >
             {{ displayUnit }}
@@ -125,7 +123,7 @@
           <span>{{ displayString }}</span>
         </div>
         <div
-          :class="`Meter-Range monospace ${isConnected ? '' : 'hide-item'}`"
+          :class="`Meter-Range monospace`"
           :style="`color: ${$theme.lcd.range}`"
         >
           {{ range == "manual" ? "MANU" : range }}

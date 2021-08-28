@@ -13,21 +13,9 @@ export default {
         return (this.negative ? '-' : '') + textUnfor.text;
       return textUnfor.text;
     },
-    displayStringUnformatted() {
-      if (this.bootState == -1) return {
-        text: "TEST",
-        ok: false
-      };
-      if (this.bootState == 0) return {
-        text: "WAIT 5",
-        ok: false
-      };
-      if (this.bootState == 1) return {
-        text: "READY",
-        ok: false
-      };
+    displayStringUnformatted() {      
       if (!this.isConnected) return {
-        text: "ERROR",
+        text: "------",
         ok: false
       };
       if (this.operationalState == 1) return {
@@ -38,14 +26,8 @@ export default {
         text: "VL.!!",
         ok: false
       };
-      let fixedVal = this.displayStringRequiredLength;
-      let valAsFull = '';
-      do {
-        fixedVal--;
-        valAsFull = this.value.toFixed(fixedVal);
-      } while (valAsFull.length > this.displayStringRequiredLength)
       return {
-        text: valAsFull,
+        text: this.valueS,
         ok: true
       };
     },
@@ -55,15 +37,14 @@ export default {
       defaultLCDLength: 6,
       negLCDLength: 5,
 
-      bootState: -1,
-      isConnected: false,
+      isConnected: true,
 
       currentType: "DC",
       displayUnit: "V",
       negative: false,
       range: "auto",
       mode: "voltage",
-      value: 0,
+      valueS: '',
       onHold: false,
       lowBattery: false,
       operationalState: 0
@@ -80,21 +61,19 @@ export default {
       return true;
     }
   },
-  beforeDestroy() {
-    this.eventBus.off("ws-boot");
+  beforeUnmount() {
     this.eventBus.off("ws-state");
-    this.eventBus.off("ws-current-type");
-    this.eventBus.off("ws-operation");
-    this.eventBus.off("ws-hold");
-    this.eventBus.off("ws-batt-low");
-    this.eventBus.off("ws-unit");
-    this.eventBus.off("ws-mode");
-    this.eventBus.off("ws-range");
-    this.eventBus.off("ws-value");
+    this.eventBus.off("e-current-type");
+    this.eventBus.off("e-operation");
+    this.eventBus.off("e-hold");
+    this.eventBus.off("e-batt-low");
+    this.eventBus.off("e-unit");
+    this.eventBus.off("e-mode");
+    this.eventBus.off("e-range");
+    this.eventBus.off("e-display-string");
   },
   mounted() {
     const self = this;
-    this.eventBus.on("ws-boot", (x) => self.bootState = x);
     this.eventBus.on("ws-state", state => self.isConnected = state);
 
     this.eventBus.on("e-current-type", cType => self.updateData('currentType', cType));
@@ -104,13 +83,6 @@ export default {
     this.eventBus.on("e-unit", unit => self.updateData('displayUnit', unit));
     this.eventBus.on("e-mode", mode => self.updateData('mode', mode));
     this.eventBus.on("e-range", range => self.updateData('range', range));
-    this.eventBus.on("e-value", value => {
-      let canUpdate = self.updateData('negative', (value < 0));
-      if (!canUpdate) return;
-      if (self.negative) {
-        value = value * -1;
-      }
-      self.updateData('value', value);
-    });
+    this.eventBus.on("e-display-string", value => self.updateData('valueS', value));
   }
 };

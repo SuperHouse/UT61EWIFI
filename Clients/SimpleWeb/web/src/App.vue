@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <loader v-if="loading" />
+  <div v-else>
     <lcd />
     <liveGraph />
     <theme />
@@ -17,6 +18,7 @@ import logo from "./components/logo/logo.vue";
 import lcd from "./components/lcd/lcd.vue";
 import theme from "./components/theme/theme.vue";
 import liveGraph from "./components/live-graph/graph.vue";
+import loader from "./components/loader/loader.vue";
 import cookies from "cookies-js";
 
 export default {
@@ -25,6 +27,7 @@ export default {
     logo,
     lcd,
     liveGraph,
+    loader,
     theme,
   },
   methods: {
@@ -36,6 +39,22 @@ export default {
   },
   created() {
     console.log(this.$themes);
+  },
+  data() {
+    return {
+      loading: true,
+    };
+  },
+  beforeUnmount() {
+    this.eventBus.off("ws-state");
+  },
+  mounted() {
+    const self = this;
+    this.eventBus.on("ws-state", (state) => {
+      if (!state) return;
+      self.loading = false;
+      this.eventBus.off("ws-state");
+    });
   },
 };
 </script>

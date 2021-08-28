@@ -1,20 +1,6 @@
 import cookies from 'cookies-js';
 
 const themes = [{
-  name: 'dark',
-  primary: '#ce1729',
-  secondary: '#888888',
-  lcd: {
-    hold: '#ce1729',
-    bgAlert: '#ce1729',
-    bg: '#252525',
-    alt: 'black',
-    active: 'white',
-    unit: 'white',
-    range: 'white',
-    text: 'white',
-  }
-}, {
   name: 'default',
   primary: '#502bfe',
   secondary: '#888888',
@@ -27,6 +13,20 @@ const themes = [{
     unit: 'black',
     range: 'black',
     text: 'black',
+  }
+}, {
+  name: 'dark',
+  primary: '#ce1729',
+  secondary: '#888888',
+  lcd: {
+    hold: '#ce1729',
+    bgAlert: '#ce1729',
+    bg: '#252525',
+    alt: 'black',
+    active: 'white',
+    unit: 'white',
+    range: 'white',
+    text: 'white',
   }
 }];
 

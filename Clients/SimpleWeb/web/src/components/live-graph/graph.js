@@ -4,7 +4,7 @@ export default {
   components: {
     apexchart: VueApexCharts,
   },
-  beforeDestroy() {
+  beforeUnmount() {
     this.eventBus.off("ws-boot");
     this.eventBus.off("ws-state");
     this.eventBus.off("ws-current-type");

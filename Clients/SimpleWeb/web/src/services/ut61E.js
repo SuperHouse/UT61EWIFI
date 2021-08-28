@@ -17,6 +17,7 @@ export default {
     });
     Vue.$eventBus.on("ws-data", data => {
       //console.log(data);
+      Vue.$eventBus.emit('e-display-string', data.display_string);
       Vue.$eventBus.emit('e-current-type', data.currentType);
       Vue.$eventBus.emit('e-value', data.value);
       Vue.$eventBus.emit('e-hold', data.hold);

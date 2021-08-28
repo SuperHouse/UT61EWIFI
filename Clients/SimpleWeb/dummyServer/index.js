@@ -6,9 +6,9 @@ const mqtt = require('mqtt')
 const lockToSingleType = false;
 const numberRange = [0, 250];
 const keepModeForX = 10;
-const canGoNeg = false;
-const canHold = false;
-const liveFakeData = true;
+const canGoNeg = true;
+const canHold = true;
+const liveFakeData = false;
 const relayFromMQTT = false;
 const MQTT_Host = [{
   host: '0',
