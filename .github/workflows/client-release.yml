@@ -20,23 +20,8 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
-      # Clients - SimpleWeb
-      - run: |
-          cd ./Clients/SimpleWeb/web;
-          npm ci;
-          npm run build;
-          cd ./dist;
-          cp ../../../../License/* ./;
-          tar -czvf SimpleWeb-WebUI.tar.gz ./*;
 
-      # Clients - Node-RED
-      - run: |
-          cd ./Clients/Node-RED;
-          node build.js;
-          mkdir dist;
-          cd dist;
-          cp ../../../License/* ./;
-          tar -czvf SimpleWeb-NodeRED.tar.gz ../*.json;
+      - run: bash ./Clients/build/release.sh
 
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -45,5 +30,4 @@ jobs:
           prerelease: false
           title: "Clients"
           files: |
-            Clients/SimpleWeb/web/dist/*.tar.gz
-            Clients/Node-RED/dist/*.tar.gz
+            Clients/build/release/*.tar.gz

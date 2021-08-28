@@ -25,12 +25,5 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
-      # Clients - SimpleWeb
-      - run: |
-          cd ./Clients/SimpleWeb/web;
-          npm ci;
-          npm run build;
-      # Clients - Node-RED
-      - run: |
-          cd ./Clients/Node-Red;
-          node build.js;
+
+      - run: bash ./Clients/build/build.sh
