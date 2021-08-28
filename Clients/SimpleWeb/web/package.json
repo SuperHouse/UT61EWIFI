@@ -2,6 +2,8 @@
   "name": "simple-web",
   "version": "0.1.0",
   "private": true,
+  "license": "SEE REPO",
+  "author": "Mitchell R<https://github.com/mrinc>",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
