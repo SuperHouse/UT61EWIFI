@@ -1,7 +1,6 @@
 CWD="$(pwd)";
 RELD="$CWD/Clients/build/release";
 VERF="$CWD/Clients/build/version.js";
-VERCLIF="$CWD/Clients/build/cli-version.js";
 VERFNR="$CWD/Clients/build/version.node-red.js";
 
 mkdir $RELD;
@@ -44,5 +43,6 @@ tar -czvf "$RELD/SimpleWeb-Desktop-rpm-x64-$DAV.tar.gz" ./out/make/rpm/x64/*.*;
 
 cd $CWD;
 cd ./Clients/build;
-RELVERSION="$(node $VERCLIF)";
+RELVERSION="$(node cli-version.js)";
+echo "RELVERSION=$RELVERSION"
 echo "::set-output name=RELVERSION::$RELVERSION"

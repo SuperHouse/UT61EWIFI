@@ -17,14 +17,16 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js ${{ matrix.node-version }}
-        id: build-and-release
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
 
-      - run: bash ./Clients/build/release.sh
-
-      - uses: "marvinpinto/action-automatic-releases@latest"
+      - name: Run Release
+        id: build-and-release
+        run: bash ./Clients/build/release.sh
+      
+      - name: Post GitHub Release
+        uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           automatic_release_tag: "latest"
