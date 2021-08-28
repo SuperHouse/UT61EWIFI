@@ -1,21 +1,21 @@
 import cookies from 'cookies-js';
 
-let customHashUrl = `${window.location.hash}`;
-if (customHashUrl.length > 3)
-  window._customWSHost = customHashUrl.substring(1);
-
-const WS_URLS = [
-  `ws://${location.host}/websocket`,
-  `ws://${location.host}/endpoint/websocket`,
-  `wss://${location.host}/websocket`,
-  `wss://${location.host}/endpoint/websocket`,
-  window._customWSHost || 'ws://localhost:8999/'
-];
-
 let serverConnectionTo = null;
 
 export default {
   install(Vue) {
+    let customHashUrl = Vue.$tools.getParameterByName('wsserver')
+    if (customHashUrl !== null && customHashUrl !== '')
+      window._customWSHost = customHashUrl.substring(1);
+
+    const WS_URLS = [
+      `ws://${location.host}/websocket`,
+      `ws://${location.host}/endpoint/websocket`,
+      `wss://${location.host}/websocket`,
+      `wss://${location.host}/endpoint/websocket`,
+      window._customWSHost || 'ws://localhost:8999/'
+    ];
+
     Vue.$eventBus.emit("ws-state", false);
     const connectToServer = () => {
       console.log('CONNECT TO: ' + serverConnectionTo);

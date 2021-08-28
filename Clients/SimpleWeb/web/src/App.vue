@@ -1,8 +1,8 @@
 <template>
   <loader v-if="loading" />
   <div v-else>
-    <lcd />
-    <liveGraph />
+    <lcd v-if="page === 'lcd'" />
+    <liveGraph v-if="page === 'graph'" />
     <theme />
 
     <router-link src="https://www.superhouse.tv/" target="_blank">
@@ -43,6 +43,7 @@ export default {
   data() {
     return {
       loading: true,
+      page: "",
     };
   },
   beforeUnmount() {
@@ -53,8 +54,10 @@ export default {
     this.eventBus.on("ws-state", (state) => {
       if (!state) return;
       self.loading = false;
-      this.eventBus.off("ws-state");
+      self.eventBus.off("ws-state");
     });
+    this.page = this.$tools.getParameterByName("page");
+    this.$tools.forceNavigate({ page: this.page });
   },
 };
 </script>
