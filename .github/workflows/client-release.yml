@@ -36,6 +36,6 @@ jobs:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           automatic_release_tag: "latest"
           prerelease: false
-          title: "Clients-${{ steps.build-and-release.output.RELVERSION }}"
+          title: "Clients-${{ steps.build-and-release.outputs.RELVERSION }}"
           files: |
             Clients/build/release/*.tar.gz
