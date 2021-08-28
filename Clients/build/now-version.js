@@ -4,7 +4,7 @@ module.exports = function(version) {
   let major = versionKeys[0];
   let minor = versionKeys[1];
   let now = new Date();
-  let month = `${now.getMonth()}`;
+  let month = `${now.getMonth()+1}`;
   if (month.length == 1)
     month = `0${month}`
   let day = `${now.getDate()}`;

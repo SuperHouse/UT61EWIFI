@@ -14,6 +14,9 @@ jobs:
       matrix:
         node-version: [14.x]
 
+    outputs:
+      RELVERSION: ${{ steps.build-and-release.outputs.RELVERSION }}
+    
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js ${{ matrix.node-version }}
@@ -24,6 +27,8 @@ jobs:
       - name: Run Release
         id: build-and-release
         run: bash ./Clients/build/release.sh
+
+      - run: echo ${{ steps.build-and-release.outputs.RELVERSION }}
       
       - name: Post GitHub Release
         uses: "marvinpinto/action-automatic-releases@latest"

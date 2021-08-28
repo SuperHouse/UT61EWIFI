@@ -44,5 +44,5 @@ tar -czvf "$RELD/SimpleWeb-Desktop-rpm-x64-$DAV.tar.gz" ./out/make/rpm/x64/*.*;
 cd $CWD;
 cd ./Clients/build;
 RELVERSION="$(node cli-version.js)";
-echo "RELVERSION=$RELVERSION"
-echo "::set-output name=RELVERSION::$RELVERSION"
+echo "RELVERSION=$RELVERSION";
+echo "::set-output name=RELVERSION::$RELVERSION";
