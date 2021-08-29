@@ -4,19 +4,17 @@ let serverConnectionTo = null;
 
 export default {
   install(Vue) {
-    let customHashUrl = Vue.$tools.getParameterByName('wsserver')
-    if (customHashUrl !== null && customHashUrl !== '')
-      window._customWSHost = customHashUrl.substring(1);
-
     const WS_URLS = [
       `ws://${location.host}/websocket`,
       `ws://${location.host}/endpoint/websocket`,
       `wss://${location.host}/websocket`,
       `wss://${location.host}/endpoint/websocket`,
+      Vue.$tools.getParameterByName('wsserver') || 'wss://localhost:8999/',
       window._customWSHost || 'ws://localhost:8999/'
     ];
 
     Vue.$eventBus.emit("ws-state", false);
+    let failedRepeater = 0;
     const connectToServer = () => {
       console.log('CONNECT TO: ' + serverConnectionTo);
       Vue.$eventBus.emit("ws-boot", 1);
@@ -33,10 +31,18 @@ export default {
         console.log('WS OPENED');
         Vue.$eventBus.emit("ws-boot", 2);
         Vue.$eventBus.emit("ws-state", true);
+        failedRepeater = -1;
       };
       WS_SERVER.onclose = () => {
         console.log('WS CLOSED');
         Vue.$eventBus.emit("ws-state", false);
+        if (failedRepeater !== -1) {
+          failedRepeater++;
+          if (failedRepeater > 5) {
+            console.error('Could not connect to known server... clear and retry');
+            return Vue.$tools.resetSession();
+          }
+        }
         setTimeout(connectToServer, 1000);
       };
       WS_SERVER.onerror = (err) => {
@@ -45,6 +51,7 @@ export default {
         console.error(err.data)
         //WS_SERVER.close();
       };
+      Vue.$eventBus.emit("ws-boot", 1);
     }
 
     const findConnectableServer = () => {
@@ -63,7 +70,9 @@ export default {
           Vue.$eventBus.emit("ws-boot", 0);
           setTimeout(connectToServer, 5000);
         } else {
-          setTimeout(findConnectableServer, 5000);
+          console.error('Could not find server to connect to');
+          Vue.$tools.resetSession();
+          //setTimeout(findConnectableServer, 5000);
         }
       };
       for (let srv of WS_URLS) {
@@ -79,6 +88,7 @@ export default {
             closeAllServers();
           };
           tWS.onclose = () => {
+            Vue.$eventBus.emit("ws-boot", -1);
             for (let i = 0; i < wsServers.length; i++) {
               if (wsServers[i].url === srv) {
                 wsServers.splice(i, 1);
@@ -91,13 +101,14 @@ export default {
           console.error(xc)
         }
       }
+      Vue.$eventBus.emit("ws-boot", -1);
     }
 
     let knownServer = cookies.get('active-server') || null;
     if (knownServer !== null && knownServer !== '') {
       serverConnectionTo = knownServer;
       console.log(`Using known server: ${serverConnectionTo}`);
-      Vue.$eventBus.emit("ws-boot", 0);
+      Vue.$eventBus.emit("ws-boot", 1);
       return connectToServer();
     }
     findConnectableServer();

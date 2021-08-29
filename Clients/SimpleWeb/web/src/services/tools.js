@@ -2,7 +2,13 @@ const knownProps = ['page', 'wsserver'];
 const defaults = {
   page: 'lcd'
 };
+import cookies from "cookies-js";
 const tools = {
+  resetSession() {
+    cookies.expire("active-server");
+    cookies.expire("active-theme");
+    window.location.reload(true);
+  },
   forceNavigate(props = {}) {
     let pageObjs = {};
     for (let prop of knownProps) {

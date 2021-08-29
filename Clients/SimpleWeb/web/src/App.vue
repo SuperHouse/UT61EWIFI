@@ -19,7 +19,6 @@ import lcd from "./components/lcd/lcd.vue";
 import theme from "./components/theme/theme.vue";
 import liveGraph from "./components/live-graph/graph.vue";
 import loader from "./components/loader/loader.vue";
-import cookies from "cookies-js";
 
 export default {
   name: "App",
@@ -32,9 +31,7 @@ export default {
   },
   methods: {
     resetSession() {
-      cookies.expire("active-server");
-      cookies.expire("active-theme");
-      window.location.reload(true);
+      this.$tools.resetSession();
     },
   },
   created() {
