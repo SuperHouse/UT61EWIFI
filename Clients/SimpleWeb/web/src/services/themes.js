@@ -1,4 +1,4 @@
-import cookies from 'cookies-js';
+import cookies from './storage'
 
 const themes = [{
   name: 'DEFAULT',
@@ -33,6 +33,12 @@ const themes = [{
 let activeThemeIndex = Number.parseInt(cookies.get('active-theme') || '0') || 0;
 
 let activeTheme = themes[activeThemeIndex];
+
+if (activeTheme === undefined || activeTheme === null) {
+  activeTheme = themes[0];
+  activeThemeIndex = 0;
+}
+cookies.set('active-theme', activeThemeIndex);
 
 export default {
   themes,

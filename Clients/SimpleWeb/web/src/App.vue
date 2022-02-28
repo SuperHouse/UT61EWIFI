@@ -6,9 +6,9 @@
     <theme />
     <page />
 
-    <router-link src="https://www.superhouse.tv/" target="_blank">
+    <a href="https://www.superhouse.tv/" target="_blank">
       <logo />
-    </router-link>
+    </a>
 
     <div @click="resetSession()">RESET SESSION</div>
   </div>
