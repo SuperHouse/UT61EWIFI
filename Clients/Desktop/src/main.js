@@ -13,7 +13,7 @@ function createWindow() {
   const win = new BrowserWindow({
     icon: iconPath,
     width: 450,
-    height: 560,
+    height: 640,
     roundedCorners: true,
     useContentSize: true,
     autoHideMenuBar: true,

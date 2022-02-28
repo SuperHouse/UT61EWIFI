@@ -59,8 +59,8 @@
     }
   }],
   "meta": {
-    "version": "0.4.20210728223722",
-    "author": "Aaron Knox"
+    "version": "0.1-developer",
+    "author": "Jon Oxer, Aaron Knox, Mitchell Robert"
   },
   "color": "#3FADB5",
   "inputLabels": ["MQTT In (Subscribe)"],
@@ -129,7 +129,7 @@
   "type": "comment",
   "z": "1fda56b.0057529",
   "name": "UT61e Web UI - README",
-  "info": "\n\nUT61e Web UI was created by \nJon Oxer\nAaron Knox\n",
+  "info": "\n\nUT61e Web UI was created by \nJon Oxer\nAaron Knox\nMitchell Robert",
   "x": 230,
   "y": 80,
   "wires": []

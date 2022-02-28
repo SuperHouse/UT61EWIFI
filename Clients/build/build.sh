@@ -21,3 +21,5 @@ echo "Building desktop app";
 cd ./Clients/Desktop;
 npm ci;
 node build.js;
+
+cd $CWD;
