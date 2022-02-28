@@ -1,7 +1,7 @@
 import cookies from 'cookies-js';
 
 const themes = [{
-  name: 'default',
+  name: 'DEFAULT',
   primary: '#502bfe',
   secondary: '#888888',
   lcd: {
@@ -15,7 +15,7 @@ const themes = [{
     text: 'black',
   }
 }, {
-  name: 'dark',
+  name: 'DARK',
   primary: '#ce1729',
   secondary: '#888888',
   lcd: {

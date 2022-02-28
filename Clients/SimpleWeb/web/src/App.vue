@@ -1,9 +1,10 @@
 <template>
   <loader v-if="loading" />
   <div v-else>
-    <lcd v-if="page === 'lcd'" />
-    <liveGraph v-if="page === 'graph'" />
+    <lcd v-if="$page.pages.indexOf('lcd') >= 0" />
+    <liveGraph v-if="$page.pages.indexOf('graph') >= 0" />
     <theme />
+    <page />
 
     <router-link src="https://www.superhouse.tv/" target="_blank">
       <logo />
@@ -17,6 +18,7 @@
 import logo from "./components/logo/logo.vue";
 import lcd from "./components/lcd/lcd.vue";
 import theme from "./components/theme/theme.vue";
+import page from "./components/page/page.vue";
 import liveGraph from "./components/live-graph/graph.vue";
 import loader from "./components/loader/loader.vue";
 
@@ -28,6 +30,7 @@ export default {
     liveGraph,
     loader,
     theme,
+    page,
   },
   methods: {
     resetSession() {
@@ -36,11 +39,11 @@ export default {
   },
   created() {
     console.log(this.$themes);
+    console.log(this.$pages);
   },
   data() {
     return {
-      loading: true,
-      page: "",
+      loading: true
     };
   },
   beforeUnmount() {
@@ -53,8 +56,6 @@ export default {
       self.loading = false;
       self.eventBus.off("ws-state");
     });
-    this.page = this.$tools.getParameterByName("page");
-    this.$tools.forceNavigate({ page: this.page });
   },
 };
 </script>

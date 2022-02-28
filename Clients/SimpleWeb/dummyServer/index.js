@@ -8,7 +8,7 @@ const numberRange = [0, 250];
 const keepModeForX = 10;
 const canGoNeg = true;
 const canHold = true;
-const liveFakeData = false;
+const liveFakeData = true;
 const relayFromMQTT = false;
 const MQTT_Host = [{
   host: '0',

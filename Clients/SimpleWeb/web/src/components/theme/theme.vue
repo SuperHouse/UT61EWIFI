@@ -14,7 +14,7 @@
           $themeIndex === themeIndex - 1 ? $theme.primary : $theme.secondary
         }`"
       >
-        {{ themeIndex }}
+        {{ $themes[themeIndex -1].name }}
       </div>
     </div>
   </div>
@@ -33,12 +33,12 @@
   justify-content: center;
 }
 .select-theme > div {
-  width: 25px;
   height: 25px;
   line-height: 25px;
+  padding: 5px;
   border: 5px solid #888888;
   color: #888888;
-  border-radius: 50%;
+  border-radius: 15px;
   margin: 10px;
   cursor: pointer;
 }

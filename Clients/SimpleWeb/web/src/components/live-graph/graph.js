@@ -194,7 +194,7 @@ export default {
             style: {
               colors: '#888888'
             },
-            formatter: (value) => value === null ? null : `${value.toFixed(4)} ${this.displayUnit}`
+            formatter: (value) => value === undefined || value === null ? null : `${value.toFixed(4)} ${this.displayUnit}`
           }
         },
         legend: {
