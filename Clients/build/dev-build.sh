@@ -5,10 +5,6 @@ VERS="0.1-dev-only"
 mkdir $RELD;
 rm -rfv "$RELD/*";
 
-bash "$CWD/Clients/build/build.sh";
-cd $CWD;
-
-
 cd ./Clients/SimpleWeb/web;
 SWV="$VERS";
 echo "Building simple web";
