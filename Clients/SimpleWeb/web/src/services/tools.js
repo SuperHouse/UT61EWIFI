@@ -2,7 +2,7 @@ const knownProps = ['page', 'wsserver'];
 const defaults = {
   page: 'lcd'
 };
-import cookies from "cookies-js";
+import cookies from './storage';
 const tools = {
   resetSession() {
     cookies.expire("active-server");

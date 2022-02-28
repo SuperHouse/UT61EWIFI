@@ -1,6 +1,19 @@
-import cookies from 'cookies-js';
+import cookies from './storage';
 
 let serverConnectionTo = null;
+
+let bootCounter = Number.parseInt(cookies.get('boot-counter') || '0') || 0;
+
+if (bootCounter >= 0) {
+  bootCounter++;
+  cookies.set('boot-counter', bootCounter);
+
+  if (bootCounter >= 3) {
+    let forceServer = prompt('We were unable to connect to the server. Please manually enter the server address:', `ws://${location.host}/websocket`);
+    cookies.set('active-server', forceServer);
+    cookies.set('boot-counter', 0);
+  }
+}
 
 export default {
   install(Vue) {
@@ -31,6 +44,7 @@ export default {
         console.log('WS OPENED');
         Vue.$eventBus.emit("ws-boot", 2);
         Vue.$eventBus.emit("ws-state", true);
+        cookies.set('boot-counter', -1);
         failedRepeater = -1;
       };
       WS_SERVER.onclose = () => {

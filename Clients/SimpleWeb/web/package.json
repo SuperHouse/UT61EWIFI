@@ -1,1 +1,50 @@
-{"name":"simple-web","version":"0.1.20220228131611","private":true,"license":"SEE REPO","author":"Mitchell R<https://github.com/mrinc>","scripts":{"serve":"vue-cli-service serve","build":"vue-cli-service build","lint":"vue-cli-service lint"},"dependencies":{"apexcharts":"^3.33.1","cookies-js":"^1.2.3","core-js":"^3.21.1","install":"^0.13.0","mitt":"^3.0.0","npm":"^7.24.2","vue":"^3.2.31","vue3-apexcharts":"^1.4.1"},"devDependencies":{"@vue/cli-plugin-babel":"^4.5.15","@vue/cli-plugin-eslint":"^4.5.15","@vue/cli-service":"^4.5.15","@vue/compiler-sfc":"^3.2.31","babel-eslint":"^10.1.0","eslint":"^6.7.2","eslint-plugin-vue":"^7.20.0","vue-template-compiler":"^2.6.14"},"eslintConfig":{"root":true,"env":{"node":true},"extends":["plugin:vue/vue3-essential","eslint:recommended"],"parserOptions":{"parser":"babel-eslint"},"rules":{}},"browserslist":["> 10%","last 2 versions","not dead"]}
+{
+  "name": "simple-web",
+  "version": "0.1.20220228131611",
+  "private": true,
+  "license": "SEE REPO",
+  "author": "Mitchell R<https://github.com/mrinc>",
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "apexcharts": "^3.33.1",
+    "core-js": "^3.21.1",
+    "install": "^0.13.0",
+    "mitt": "^3.0.0",
+    "npm": "^7.24.2",
+    "vue": "^3.2.31",
+    "vue3-apexcharts": "^1.4.1"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "^4.5.15",
+    "@vue/cli-plugin-eslint": "^4.5.15",
+    "@vue/cli-service": "^4.5.15",
+    "@vue/compiler-sfc": "^3.2.31",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^6.7.2",
+    "eslint-plugin-vue": "^7.20.0",
+    "vue-template-compiler": "^2.6.14"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/vue3-essential",
+      "eslint:recommended"
+    ],
+    "parserOptions": {
+      "parser": "babel-eslint"
+    },
+    "rules": {}
+  },
+  "browserslist": [
+    "> 10%",
+    "last 2 versions",
+    "not dead"
+  ]
+}

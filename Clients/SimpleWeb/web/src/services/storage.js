@@ -8,5 +8,8 @@ export default {
       return null;
     }
     return val;
+  },
+  expire(name) {
+    window.localStorage.removeItem(name);
   }
 }
