@@ -89,8 +89,10 @@ export default {
           //setTimeout(findConnectableServer, 5000);
         }
       };
+
       for (let srv of WS_URLS) {
         console.log(`Try WS Connect to ${srv}`);
+        console.log("poo");
         try {
           let tWS = new WebSocket(srv);
           wsServers.push({
@@ -125,6 +127,7 @@ export default {
       Vue.$eventBus.emit("ws-boot", 1);
       return connectToServer();
     }
+    
     findConnectableServer();
   },
 };

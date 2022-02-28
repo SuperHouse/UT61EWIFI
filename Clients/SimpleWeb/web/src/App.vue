@@ -1,36 +1,26 @@
 <template>
-  <loader v-if="loading" />
-  <div v-else>
-    <lcd v-if="$page.pages.indexOf('lcd') >= 0" />
-    <liveGraph v-if="$page.pages.indexOf('graph') >= 0" />
-    <theme />
-    <page />
-
-    <a href="https://www.superhouse.tv/" target="_blank">
-      <logo />
-    </a>
-
-    <div @click="resetSession()">RESET SESSION</div>
+  <div class="wrapper" :class="$theme.className">
+    <mainHeader />
+    <lcd v-if="page === 'meter'" />
+    <liveGraph v-if="page === 'graph'" />
+    <controls />
+    <div style="display: none;" @click="resetSession()">RESET SESSION</div>
   </div>
 </template>
 
 <script>
-import logo from "./components/logo/logo.vue";
+import mainHeader from "./components/header/header.vue";
 import lcd from "./components/lcd/lcd.vue";
-import theme from "./components/theme/theme.vue";
-import page from "./components/page/page.vue";
+import controls from "./components/controls/controls.vue";
 import liveGraph from "./components/live-graph/graph.vue";
-import loader from "./components/loader/loader.vue";
 
 export default {
   name: "App",
   components: {
-    logo,
+    mainHeader,
     lcd,
+    controls,
     liveGraph,
-    loader,
-    theme,
-    page,
   },
   methods: {
     resetSession() {
@@ -43,7 +33,8 @@ export default {
   },
   data() {
     return {
-      loading: true
+      loading: true,
+      page: '',
     };
   },
   beforeUnmount() {
@@ -56,17 +47,45 @@ export default {
       self.loading = false;
       self.eventBus.off("ws-state");
     });
+    this.page = this.$tools.getParameterByName("page");
+    this.$tools.forceNavigate({ page: this.page });
   },
 };
 </script>
 
 <style>
+:root {
+  --default-spacing: 4vw;
+}
+
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  color: white;
+  font-family: 'Roboto Mono', monospace;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #ffffff;
-  background-color: #333333;
 }
+.wrapper {
+  padding: var(--default-spacing) 2.5vw;
+  background-color: var(--background);
+  height: 100vh;
+}
+.theme-default {
+  --background: black;
+  --lcd-background: #5139FA;
+  --lcd-text-color: black;
+  --control-background: #484646;
+  --control-text-color: white;
+  --ghost-opacity: 0.07;
+}
+.theme-contrast {
+  --background: #333;
+  --lcd-background: #252525;
+  --lcd-text-color: white;
+  --control-background: #484646;
+  --control-text-color: white;
+  --ghost-opacity: 0.04;
+}
+
 </style>
+
+<style src="./assets/fonts/fonts.css"></style>

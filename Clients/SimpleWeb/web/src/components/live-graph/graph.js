@@ -106,7 +106,7 @@ export default {
         newSeries.push(this.data[key])
       }
       let colours = '#222222,'.repeat(keys.length).split(',').filter(x => x === '' ? null : x);
-      colours[keys.indexOf(this.mode)] = this.$theme.primary;
+      colours[keys.indexOf(this.mode)] = this.$theme.chartColour;
       this.$data.chartOptions.colors = colours;
 
       if (this.$refs.chart === null)
@@ -149,7 +149,6 @@ export default {
           animations: {
             enabled: false,
           },
-          height: 350,
           type: 'line',
           toolbar: {
             show: false
@@ -157,7 +156,7 @@ export default {
           zoom: {
             enabled: false
           },
-          foreColor: '#888888'
+          foreColor: '#ffffff',
         },
         colors: [],
         dataLabels: {
@@ -168,15 +167,16 @@ export default {
           theme: "dark"
         },
         stroke: {
-          curve: 'smooth'
+          curve: 'smooth',
+          colors: ['#ff0000']
         },
         grid: {
-          row: {
-            colors: ['#333333']
-          },
-          column: {
-            colors: ['#333333']
-          }
+          // row: {
+          //   colors: ['#333333']
+          // },
+          // column: {
+          //   colors: ['#ff0000']
+          // }
         },
         markers: {
           size: 0
@@ -185,16 +185,22 @@ export default {
           categories: [],
           labels: {
             style: {
-              colors: '#888888'
+              colors: '#ffffff',
+              fontSize: '16px',
             }
           },
         },
         yaxis: {
           labels: {
             style: {
-              colors: '#888888'
+              colors: '#ffffff',
+              fontSize: '16px',
             },
-            formatter: (value) => value === undefined || value === null ? null : `${value.toFixed(4)} ${this.displayUnit}`
+            formatter: (value) => value === null ? null : `${value.toFixed(4)} ${this.displayUnit}`
+          },
+          axisBorder: {
+            show: true,
+            color: '#ffffff'
           }
         },
         legend: {

@@ -1,21 +1,17 @@
 export default {
+  created() {
+    const self = this;
+    this.eventBus.on("ws-boot", (x) => self.bootState = x);
+  },
   computed: {
-    displayStringRequiredLength() {
-      return this.negative ? this.negLCDLength : this.defaultLCDLength;
-    },
     displayString() {
       let textUnfor = this.displayStringUnformatted;
-      let thisLength = textUnfor.ok ? this.displayStringRequiredLength : this.defaultLCDLength;
-      textUnfor.text = textUnfor.text.replace(/ /g, '!');
-      thisLength += (textUnfor.text.match(/\./g) || []).length;
-      while (textUnfor.text.length < thisLength) textUnfor.text = `!${textUnfor.text}`;
-      if (textUnfor.ok)
-        return (this.negative ? '-' : '') + textUnfor.text;
+
       return textUnfor.text;
     },
-    displayStringUnformatted() {      
+    displayStringUnformatted() {   
       if (!this.isConnected) return {
-        text: "------",
+        text: "",
         ok: false
       };
       if (this.operationalState == 1) return {
@@ -31,13 +27,19 @@ export default {
         ok: true
       };
     },
+    bootStatus() {
+      if (this.bootState == -2) return "BOOTING...";
+      if (this.bootState == -1) return "FINDING SERVER";
+      if (this.bootState == 0) return "SAVING KNOWN SERVER";
+      if (this.bootState == 1) return "CONNECTING";
+      if (this.bootState == 2) return "CONNECTED";
+      return "ERROR: UNKNOWN STATE";
+    }
   },
   data() {
     return {
-      defaultLCDLength: 6,
-      negLCDLength: 5,
-
       isConnected: true,
+      bootState: -2,
 
       currentType: "DC",
       displayUnit: "V",
@@ -52,6 +54,9 @@ export default {
   },
   methods: {
     updateData(name, value) {
+      if (this.bootState != 2) {
+        this.bootState = 2;
+      }
       if (name === "onHold") {
         this.onHold = value;
         return true;
@@ -62,6 +67,7 @@ export default {
     }
   },
   beforeUnmount() {
+    this.eventBus.off("ws-boot");
     this.eventBus.off("ws-state");
     this.eventBus.off("e-current-type");
     this.eventBus.off("e-operation");
@@ -71,6 +77,7 @@ export default {
     this.eventBus.off("e-mode");
     this.eventBus.off("e-range");
     this.eventBus.off("e-display-string");
+    this.eventBus.off("e-negative");
   },
   mounted() {
     const self = this;
@@ -84,5 +91,6 @@ export default {
     this.eventBus.on("e-mode", mode => self.updateData('mode', mode));
     this.eventBus.on("e-range", range => self.updateData('range', range));
     this.eventBus.on("e-display-string", value => self.updateData('valueS', value));
+    this.eventBus.on("e-negative", value => self.updateData('negative', value));
   }
 };

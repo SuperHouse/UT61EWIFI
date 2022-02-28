@@ -13,6 +13,7 @@ export default {
         Vue.$eventBus.emit('e-mode', 'voltage');
         Vue.$eventBus.emit('e-batt-low', false);
         Vue.$eventBus.emit('e-operation', 0);
+        Vue.$eventBus.emit('e-negative', false);
       }
     });
     Vue.$eventBus.on("ws-data", data => {
@@ -26,6 +27,7 @@ export default {
       Vue.$eventBus.emit('e-mode', data.mode);
       Vue.$eventBus.emit('e-batt-low', data.battery_low);
       Vue.$eventBus.emit('e-operation', data.operation === "normal" ? 0 : (data.operation === "overload" ? 1 : -1));
+      Vue.$eventBus.emit('e-negative', data.negative);
     });
   },
 };
