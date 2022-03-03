@@ -9,6 +9,7 @@ const keepModeForX = 10;
 const canGoNeg = true;
 const canHold = true;
 const liveFakeData = true;
+const liveFakeDataRelayToMQTT = false;
 const relayFromMQTT = false;
 const MQTT_Host = [{
   host: '192.168.1.34',
@@ -72,11 +73,25 @@ server.listen(process.env.PORT || 8999, () => {
   console.log(`Server started on port ${server.address().port} :)`);
 
   if (liveFakeData) {
+    let MQTT_CLIENT;
+    if (liveFakeDataRelayToMQTT) {
+      console.warn(`MQTT Connect To ${MQTT_Host[0].host}:${MQTT_Host[0].port}`)
+      MQTT_CLIENT = mqtt.connect(MQTT_OPTs)
+      await new Promise((resolve) => {
+        MQTT_CLIENT.on('connect', () => {
+          console.warn('MQTT Connected');
+          resolve();
+        });
+      })
+    }
     let co = JSON.parse(require('fs').readFileSync('./log.json').toString());
     let loopData = async () => {
       for (let item of co) {
         let asStr = JSON.stringify(item);
         console.log(asStr);
+        if (liveFakeDataRelayToMQTT) {
+          MQTT_CLIENT.publish(MQTT_TOPIC, asStr);
+        }
         wss.clients.forEach(client => {
           if (client !== ws && client.readyState === 1) {
             client.send(asStr);
