@@ -1,6 +1,6 @@
 const knownProps = ['page', 'wsserver'];
 const defaults = {
-  page: 'lcd'
+  page: 'meter'
 };
 import cookies from './storage';
 const tools = {

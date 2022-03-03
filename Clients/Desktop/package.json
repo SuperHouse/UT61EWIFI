@@ -1,6 +1,6 @@
 {
   "name": "superhouse-ut61e-desktop-ui",
-  "version": "0.1-developer",
+  "version": "0.0.1-developer",
   "description": "SuperHouse UT61e UI Desktop app",
   "main": "src/main.js",
   "scripts": {

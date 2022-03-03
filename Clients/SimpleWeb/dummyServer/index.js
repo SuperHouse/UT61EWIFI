@@ -11,13 +11,13 @@ const canHold = true;
 const liveFakeData = true;
 const relayFromMQTT = false;
 const MQTT_Host = [{
-  host: '0',
-  port: 15399
+  host: '192.168.1.34',
+  port: 1883
 }];
 const MQTT_OPTs = {
   servers: MQTT_Host,
   protocolId: 'MQTT',
-  username: 'server1',
+  username: '',
   password: ''
 };
 const MQTT_TOPIC = 'tele/7054A0/JSON';

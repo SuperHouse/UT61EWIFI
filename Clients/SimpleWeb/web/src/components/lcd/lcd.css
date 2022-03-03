@@ -6,11 +6,10 @@
 
 .lcd {
   margin: 0;
-  padding: 4vw 2.5vw 2vw 2.5vw;
+  padding: var(--default-spacing) 0;
 }
-
-.monospace {
-  font-family: "Roboto Mono", monospace;
+.lcd svg {
+  fill: var(--lcd-text-color);
 }
 
 .D7MBI {
@@ -18,32 +17,14 @@
 }
 
 
-.header {
-  display: flex;
-  justify-content: space-between;
-  margin: 0 0 2vw 0;
-}
-
-.header__display_unit {
-  width: 16vw;
-  height: auto;
-}
-
-.header__ut16e {
-  width: 16vw;
-  height: auto;
-}
-
 .Meter-Wrapper {
   position: relative;
   height: 50vw;
+  color: var(--lcd-text-color);
   padding: 2.5vw 4vw 5vw 4vw;
   border-radius: 2.5vw;
-  background-color: #252525;
+  background-color: var(--lcd-background);
   box-shadow: 0.4vw 0.4vw 0.1vw 0 rgba(0, 0, 0, 0.1) inset;
-}
-.Meter-Wrapper.c-level {
-  background-color: #c21717;
 }
 
 .Meter-Wrapper__inner {
@@ -56,6 +37,7 @@
 
 .Meter-Top-Bar {
   font-size: 6vw;
+  text-align: left;
   display: flex;
   flex-wrap: nowrap;
 }
@@ -82,7 +64,7 @@
   width: auto;
   height: 8vw;
   margin: 0 1vw;
-  opacity: 0.07;
+  opacity: var(--ghost-opacity);
 }
 
 .Meter-Value {
@@ -93,16 +75,26 @@
 
 .Meter-Value:before {
   content: "888888";
-  color: rgba(0, 0, 0, 0.07);
+  opacity: var(--ghost-opacity);
   display: block;
 }
 
-.Meter-Value span {
+.Meter-Value__negative {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
+  text-align: left;
+}
+
+.Meter-Value__text {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  text-align: right;
 }
 
 .Meter-Range {
@@ -120,16 +112,6 @@
   opacity: 0;
 }
 
-.logo-superhouse {
-  width: 40%;
-  height: auto;
-  margin: 0 auto;
-  display: block;
-}
-
-.hide-item {
-  opacity: 0 !important;
-}
 .full-item {
   opacity: 1 !important;
 }
