@@ -69,7 +69,7 @@ const wss = new ws.Server({
   server
 });
 
-server.listen(process.env.PORT || 8999, () => {
+server.listen(process.env.PORT || 8999, async () => {
   console.log(`Server started on port ${server.address().port} :)`);
 
   if (liveFakeData) {
