@@ -31,20 +31,21 @@ cp ../../../License/* ./;
 mkdir "$RELD/SimpleWeb-NodeRED-$NRV";
 cp -Rv ./*.* "$RELD/SimpleWeb-NodeRED-$NRV/";
 
-#cd $CWD;
-#
-#echo "Release desktop app";
-#cd ./Clients/Desktop;
-#DAV="$VERS";
-#npx electron-forge make;
-#cp ../../License/* ./out/make/deb/x64/;
-#echo "$DAV" > ./out/make/deb/x64/version.txt;
-#mkdir "$RELD/SimpleWeb-Desktop-deb-x64-$DAV";
-#cp -Rv ./out/make/deb/x64/*.* "$RELD/SimpleWeb-Desktop-deb-x64-$DAV/";
-#cp ../../License/* ./out/make/rpm/x64/;
-#echo "$DAV" > ./out/make/rpm/x64/version.txt;
-#mkdir "$RELD/SimpleWeb-Desktop-rpm-x64-$DAV";
-#cp -Rv ./out/make/rpm/x64/*.* "$RELD/SimpleWeb-Desktop-rpm-x64-$DAV/";
+cd $CWD;
+
+echo "Release desktop app";
+cd ./Clients/Desktop;
+DAV="$VERS";
+npx electron-forge make;
+cp ../../License/* ./out/make/deb/x64/;
+echo "$DAV" > ./out/make/deb/x64/version.txt;
+mkdir "$RELD/SimpleWeb-Desktop-deb-x64-$DAV";
+cp -Rv ./out/make/deb/x64/*.* "$RELD/SimpleWeb-Desktop-deb-x64-$DAV/";
+cp ../../License/* ./out/make/rpm/x64/;
+echo "$DAV" > ./out/make/rpm/x64/version.txt;
+mkdir "$RELD/SimpleWeb-Desktop-rpm-x64-$DAV";
+cp -Rv ./out/make/rpm/x64/*.* "$RELD/SimpleWeb-Desktop-rpm-x64-$DAV/";
+cp ./out/make/rpm/x64/*.* "$RELD/SimpleWeb-Desktop-rpm-x64-$DAV/";
 
 cd $CWD;
 echo "RELVERSION=$VERS";
