@@ -22,6 +22,11 @@ More details:
   http://www.superhouse.tv/ut61ewifi
 
 
+Releases
+--------
+See latest release here: (https://github.com/SuperHouse/UT61EWIFI/releases)[https://github.com/SuperHouse/UT61EWIFI/releases]  
+
+
 Clients
 --------
 To build the app locally, you can run ```bash ./Clients/build/build.sh``` from the ```/``` (root) of this repo.  
