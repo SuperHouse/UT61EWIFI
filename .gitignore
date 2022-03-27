@@ -4,3 +4,11 @@ Icon
 
 Firmware/UT61EWiFiD1MiniDisplay/config.h
 .Arduino
+node_modules
+
+node_modules
+/Clients/build/release
+/Clients/Desktop/out
+/Clients/Desktop/src/index.html
+/Clients/Node-RED/dist
+/Clients/SimpleWeb/web/dist

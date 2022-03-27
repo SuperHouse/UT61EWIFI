@@ -1,0 +1,222 @@
+[{
+  "id": "1fda56b.0057529",
+  "type": "subflow",
+  "name": "SuperHouse | UT61e UI",
+  "info": "# UT61e Web UI\n\nUT61e Web UI was created by \nJon Oxer & Aaron Knox",
+  "category": "SuperHouse",
+  "in": [{
+    "x": 140,
+    "y": 280,
+    "wires": [{
+      "id": "8de359f0.4f974"
+    }]
+  }],
+  "out": [{
+    "x": 420,
+    "y": 340,
+    "wires": [{
+      "id": "1fda56b.0057529",
+      "port": 0
+    }]
+  }],
+  "env": [{
+    "name": "UI_URL",
+    "type": "str",
+    "value": "ut61e",
+    "ui": {
+      "icon": "font-awesome/fa-globe",
+      "label": {
+        "en-US": "Web UI URL"
+      },
+      "type": "input",
+      "opts": {
+        "types": ["str"]
+      }
+    }
+  }, {
+    "name": "haAddon",
+    "type": "str",
+    "value": "false",
+    "ui": {
+      "icon": "font-awesome/fa-asterisk",
+      "label": {
+        "en-US": "Node Red Home Assistant Add-on?"
+      },
+      "type": "select",
+      "opts": {
+        "opts": [{
+          "l": {
+            "en-US": "Yes"
+          },
+          "v": "true"
+        }, {
+          "l": {
+            "en-US": "No"
+          },
+          "v": "false"
+        }]
+      }
+    }
+  }],
+  "meta": {
+    "version": "0.1-developer",
+    "author": "Jon Oxer, Aaron Knox, Mitchell Robert"
+  },
+  "color": "#3FADB5",
+  "inputLabels": ["MQTT In (Subscribe)"],
+  "outputLabels": ["Debug"],
+  "icon": "node-red/bridge-dash.svg",
+  "status": {
+    "x": 360,
+    "y": 400,
+    "wires": [{
+      "id": "2e1eab15.bfdad4",
+      "port": 0
+    }]
+  }
+}, {
+  "id": "7a550761.5543f",
+  "type": "http in",
+  "z": "1fda56b.0057529",
+  "name": "",
+  "url": "${UI_URL}",
+  "method": "get",
+  "upload": false,
+  "swaggerDoc": "",
+  "x": 200,
+  "y": 140,
+  "wires": [
+    ["863aa03b.a2a89", "3eb58bbf.782c6c"]
+  ]
+}, {
+  "id": "398484ab.2e204c",
+  "type": "http response",
+  "z": "1fda56b.0057529",
+  "name": "",
+  "statusCode": "",
+  "headers": {},
+  "x": 930,
+  "y": 140,
+  "wires": []
+}, {
+  "id": "8de359f0.4f974",
+  "type": "websocket out",
+  "z": "1fda56b.0057529",
+  "name": "",
+  "server": "23ee6c51.69ca7c",
+  "client": "",
+  "x": 900,
+  "y": 280,
+  "wires": []
+}, {
+  "id": "dd666642.ac1e18",
+  "type": "template",
+  "z": "1fda56b.0057529",
+  "name": "Meter UI",
+  "field": "payload",
+  "fieldType": "msg",
+  "format": "html",
+  "syntax": "mustache",
+  "template": "{{=<% %>=}}<!DOCTYPE html><html lang=\"\"><head><meta charset=\"utf-8\"><meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>SuperHouse | UT61e UI</title></head><body>Please download the compiled NodeRED file from : <a href=\"https://github.com/SuperHouse/UT61EWIFI/releases\">https://github.com/SuperHouse/UT61EWIFI/releases</a> - SimpleWeb-NodeRED-{release version}.tar.gz</body></html>",
+  "output": "str",
+  "x": 740,
+  "y": 120,
+  "wires": [
+    ["398484ab.2e204c"]
+  ]
+}, {
+  "id": "57421a22.a5d244",
+  "type": "comment",
+  "z": "1fda56b.0057529",
+  "name": "UT61e Web UI - README",
+  "info": "\n\nUT61e Web UI was created by \nJon Oxer\nAaron Knox\nMitchell Robert",
+  "x": 230,
+  "y": 80,
+  "wires": []
+}, {
+  "id": "2e1eab15.bfdad4",
+  "type": "status",
+  "z": "1fda56b.0057529",
+  "name": "WebSocket Status",
+  "scope": ["8de359f0.4f974"],
+  "x": 210,
+  "y": 400,
+  "wires": [
+    []
+  ]
+}, {
+  "id": "3eb58bbf.782c6c",
+  "type": "trigger",
+  "z": "1fda56b.0057529",
+  "name": "Ping Pong",
+  "op1": "{}",
+  "op2": "",
+  "op1type": "json",
+  "op2type": "payl",
+  "duration": "-20",
+  "extend": false,
+  "overrideDelay": false,
+  "units": "s",
+  "reset": "",
+  "bytopic": "all",
+  "topic": "topic",
+  "outputs": 1,
+  "x": 650,
+  "y": 220,
+  "wires": [
+    ["8de359f0.4f974"]
+  ]
+}, {
+  "id": "863aa03b.a2a89",
+  "type": "change",
+  "z": "1fda56b.0057529",
+  "name": "",
+  "rules": [{
+    "t": "set",
+    "p": "payload.nrHost",
+    "pt": "msg",
+    "to": "NR_HOST",
+    "tot": "env"
+  }, {
+    "t": "set",
+    "p": "payload.haAddon",
+    "pt": "msg",
+    "to": "haAddon",
+    "tot": "env"
+  }],
+  "action": "",
+  "property": "",
+  "from": "",
+  "to": "",
+  "reg": false,
+  "x": 500,
+  "y": 140,
+  "wires": [
+    ["dd666642.ac1e18"]
+  ]
+}, {
+  "id": "23ee6c51.69ca7c",
+  "type": "websocket-listener",
+  "path": "/websocket",
+  "wholemsg": "false"
+}, {
+  "id": "672a8322.707fec",
+  "type": "subflow:1fda56b.0057529",
+  "z": "c1205520.648f",
+  "name": "",
+  "env": [{
+    "name": "Node Red Home Assistant Add-on?",
+    "value": "true",
+    "type": "str"
+  }, {
+    "name": "NR_PORT",
+    "value": "80",
+    "type": "str"
+  }],
+  "x": 490,
+  "y": 180,
+  "wires": [
+    ["a0d9af9d.fc3098"]
+  ],
+  "info": "# SuperHouse | UT61e Web UI\n\nSimple Node to output a Web UI for the Uni-Trends UT61e multimeter using the [UT61e Wifi to MQTT board](https://www.superhouse.tv/product/ut61e-multimeter-wifi-interface/) created by Jon Oxer [@SuperHouse](https://www.superhouse.tv/).\n\n---\n\n## Configuration\n\n### MQTT In Node\nConnect an \"MQTT In\" Node ensuring you configure your MQTT Broker and Topic e.g.\n\n``` \ntele/ut61e/json\n\ntele/7054A0_x/JSON\n```\n \n>  Note: UT61e Web UI expects the JSON Topic provided by the UT61e Wifi to MQTT board library.\n\n### SuperHouse | UT61e Web UI URL\nYou are able to customise the Web UI URL by default this is set to `<your-node-red-host/>ut61e` \n\ne.g.\n - http://nodered.local/ut61e\n - http://192.168.1.20:1880/ut61e\n\n---\n\n## Home Assistant with Node RED Add-On:\n\nIf you are running Node RED as an Home Assistant Add-on then you will need to ensure you access the Web UI using Home Assistant Host with the Node Red PORT.\n\nIn the Node Properties tab ensure you select 'Yes' for the field \"Node Red Home Assistant Add-on?\"\n\nYou may be aware that to access a UI using the Node Red HA Add-on you also need to append /endpoint to your url. This therefore would look like this example\n\n`http://<home-assistant-host>:<node-red-port>`/endpoint/`<\\your-ui-url>`\n\ne.g.\n - http://homeassistant.local:1880/endpoint/ut61e\n - http://192.168.1.20:1880/endpoint/ut61e\n\n---\n\n## Expected JSON Format:\n\n```\n{\n  \"value\": 242.69,\n  \"unit\": \"V\",\n  \"display_value\": 242.69,\n  \"display_unit\": \"V\",\n  \"display_string\": \"0.315\",\n  \"mode\": \"continuity\",\n  \"currentType\": \"DC\",\n  \"peak\": \"\",\n  \"relative\": false,\n  \"hold\": false,\n  \"range\": \"auto\",\n  \"operation\": \"normal\",\n  \"battery_low\": false,\n  \"negative\": false\n}\n```\n\n---\n\n## Got an Issue / Help Needed?\nIf you have an issue join the SuperHouse community on the [SuperHouse Discord](https://discord.gg/VW9YRvd) for help.\n\n\n\n"
+}]

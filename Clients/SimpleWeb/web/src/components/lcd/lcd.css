@@ -1,0 +1,117 @@
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+}
+
+.lcd {
+  margin: 0;
+  padding: var(--default-spacing) 0;
+}
+.lcd svg {
+  fill: var(--lcd-text-color);
+}
+
+.D7MBI {
+  font-family: "D7MBI", "Roboto Mono", monospace;
+}
+
+
+.Meter-Wrapper {
+  position: relative;
+  height: 50vw;
+  color: var(--lcd-text-color);
+  padding: 2.5vw 4vw 5vw 4vw;
+  border-radius: 2.5vw;
+  background-color: var(--lcd-background);
+  box-shadow: 0.4vw 0.4vw 0.1vw 0 rgba(0, 0, 0, 0.1) inset;
+}
+
+.Meter-Wrapper__inner {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.Meter-Top-Bar {
+  font-size: 6vw;
+  text-align: left;
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.Meter-Top-Bar__left,
+.Meter-Top-Bar__right {
+  position: relative;
+  min-width: 20%;
+  display: block;
+}
+
+.Meter-Top-Bar__right {
+  text-align: right;
+}
+
+.Meter-Top-Bar__centre {
+  margin: 0 auto;
+  display: flex;
+  align-content: center;
+  align-items: center;
+}
+
+.Meter-Top-Bar__centre svg {
+  width: auto;
+  height: 8vw;
+  margin: 0 1vw;
+  opacity: var(--ghost-opacity);
+}
+
+.Meter-Value {
+  position: relative;
+  font-size: 17vw;
+  align-self: center;
+}
+
+.Meter-Value:before {
+  content: "888888";
+  opacity: var(--ghost-opacity);
+  display: block;
+}
+
+.Meter-Value__negative {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  text-align: left;
+}
+
+.Meter-Value__text {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  text-align: right;
+}
+
+.Meter-Range {
+  font-size: 5vw;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+#low-battery {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: auto;
+  height: 8vw;
+  opacity: 0;
+}
+
+.full-item {
+  opacity: 1 !important;
+}
