@@ -9,7 +9,7 @@
     "make": "electron-forge make"
   },
   "keywords": [],
-  "author": "SuperHouse.tv",
+  "author": "OXRS.io",
   "license": "SEE REPO",
   "devDependencies": {
     "@electron-forge/cli": "^6.0.0-beta.59",
@@ -30,12 +30,6 @@
       },
       "makers": [
         {
-          "name": "@electron-forge/maker-squirrel",
-          "config": {
-            "name": "desktop"
-          }
-        },
-        {
           "name": "@electron-forge/maker-zip",
           "platforms": [
             "darwin"
@@ -43,14 +37,23 @@
         },
         {
           "name": "@electron-forge/maker-deb",
-          "config": {}
+          "config": {},
+          "platforms": [
+            "linux"
+          ]
         },
         {
           "name": "@electron-forge/maker-rpm",
-          "config": {}
+          "config": {},
+          "platforms": [
+            "linux"
+          ]
         },
         {
           "name": "@electron-forge/maker-squirrel",
+          "platforms": [
+            "win32"
+          ],
           "config": {
             "certificateFile": "./superhouse-ut61e.pfx",
             "certificatePassword": "ewj.DPZ5gvu1xmy9xwr"

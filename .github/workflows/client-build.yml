@@ -12,13 +12,137 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  version:
     runs-on: ubuntu-latest
+    outputs:
+        RELVERSION: ${{ steps.version.outputs.RELVERSION }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16.x
 
+      - name: Run Version
+        id: version
+        run: node ./Clients/build/now-version-cli.js
+
+
+  build-web:
+    runs-on: ubuntu-latest
+    needs: 
+      - version
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16.x
+
+      - name: Deps
+        run: |
+          cd ./Clients/SimpleWeb/web;
+          npm ci;
+
+      - name: Version
+        run: |
+          cd ./Clients/SimpleWeb/web;
+          npm version "${{ needs.version.outputs.RELVERSION }}";
+
+      - name: Build
+        run: |
+          cd ./Clients/SimpleWeb/web;
+          npm run build;
+
+      - name: Release
+        run: |
+          cd ./Clients/SimpleWeb/web/dist;
+          echo -n "${{ needs.version.outputs.RELVERSION }}" >> ./VERSION.txt;
+          cp ../../../../License/* ./;
+          mkdir ../../../../releases;
+          tar -czvf "../../../../releases/SimpleWeb-WebUI-${{ needs.version.outputs.RELVERSION }}.tar.gz" ./*.*;
+
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: web-source
+          path: |
+            ./Clients/SimpleWeb/web/dist/**/*.*
+          retention-days: 1
+        
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: web-release
+          path: |
+            releases/*.tar.gz
+          retention-days: 1
+
+
+  build-node-red:
+    runs-on: ubuntu-latest
+    needs: 
+      - version
+      - build-web
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16.x
+
+      - name: Download web-source
+        uses: actions/download-artifact@v3
+        with:
+          name: web-source
+          path: ./Clients/SimpleWeb/web/dist/
+
+      - name: Version
+        run: |
+          cd ./Clients/Node-RED;
+          node ../build/version.node-red.js "${{ needs.version.outputs.RELVERSION }}";
+
+      - name: Build
+        run: |
+          cd ./Clients/Node-RED;
+          node build.js;
+
+      - name: Release
+        run: |
+          cd ./Clients/Node-RED/dist;
+          echo -n "${{ needs.version.outputs.RELVERSION }}" >> ./VERSION.txt;
+          cp ../../../License/* ./;
+          mkdir ../../../releases;
+          tar -czvf "../../../releases/Node-RED-${{ needs.version.outputs.RELVERSION }}.tar.gz" ./*.*;
+        
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: node-red-release
+          path: |
+            releases/*.tar.gz
+          retention-days: 1
+     
+
+  build-desktop:
+    needs: 
+      - version
+      - build-web
     strategy:
       matrix:
-        node-version: [14.x]
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        node-version: [16.x]
+        include:
+          - os: ubuntu-latest
+            release_suffix: ubuntu
+          - os: macos-latest
+            release_suffix: mac
+          - os: windows-latest
+            release_suffix: windows
 
+    name: Build & Release on ${{ matrix.os }}.
+    runs-on: ${{ matrix.os }}
+    
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js ${{ matrix.node-version }}
@@ -26,4 +150,36 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - run: bash ./Clients/build/build.sh
+      - name: Download web-source
+        uses: actions/download-artifact@v3
+        with:
+          name: web-source
+          path: ./Clients/SimpleWeb/web/dist/
+
+      - name: Deps
+        run: |
+          cd ./Clients/Desktop;
+          npm ci;
+
+      - name: Version
+        run: |
+          cd ./Clients/Desktop;
+          npm version "${{ needs.version.outputs.RELVERSION }}";
+
+      - name: Pre-Build
+        run: |
+          cd ./Clients/Desktop;
+          node prebuild.js;
+
+      - name: Build
+        run: |
+          cd ./Clients/Desktop;
+          bash ../build/ci-desktop-build.sh "${{ needs.version.outputs.RELVERSION }}";
+
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: desktop-release
+          path: |
+            Clients/Desktop/out/release/*.tar.gz
+          retention-days: 1

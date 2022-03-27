@@ -21,7 +21,7 @@ for (let i = 0; i < nodeRedCode.length; i++) {
 
 if (keyIndex === null) {
   console.error('UNABLE TO FIND HTML KEY IN UT61e NODE-RED-UI')
-  return process.exit(1);
+  process.exit(1);
 }
 
 console.log('Found template file... building');

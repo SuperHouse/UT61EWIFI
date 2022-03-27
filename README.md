@@ -22,6 +22,12 @@ More details:
   http://www.superhouse.tv/ut61ewifi
 
 
+Clients
+--------
+To build the app locally, you can run ```bash ./Clients/build/build.sh``` from the ```/``` (root) of this repo.  
+It will run a build of all the clients. (*nodeJS v16 and bash are required*)
+
+
 Hardware
 --------
 The "Hardware" directory contains the PCB design as an EAGLE project.
