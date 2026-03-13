@@ -34,6 +34,25 @@ Firmware
 The "Firmware" directory contains example firmware as an Arduino
 project.
 
+The Wemos D1 Mini used in the adapter has an Espressif ESP8266 MCU. 
+This is not supported by default by the Arduino IDE, so the first 
+step is to install a board profile to suit.
+
+Full steps are explained here:
+
+<https://randomnerdtutorials.com/how-to-install-esp8266-board-arduino-ide/>
+
+Then select: 
+
+  Tools -> Board -> ESP8266 Boards -> "WEMOS(LOLIN) D1 Mini (clone)".
+
+Other ESP8266 board profiles may also work, depending on the specific 
+D1 mini that you use.
+
+Two libraries are also required. Install using the Arduino library manager: 
+
+ * "PubSubClient" by Nick O'Leary
+ * "NeoPixel" by Adafruit
 
 Credits
 -------
