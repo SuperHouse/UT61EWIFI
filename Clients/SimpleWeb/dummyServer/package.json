@@ -1,0 +1,16 @@
+{
+  "name": "dummyserver",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Mitchell R<https://github.com/mrinc>",
+  "license": "SEE REPO",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mqtt": "^4.2.8",
+    "ws": "^8.1.0"
+  }
+}

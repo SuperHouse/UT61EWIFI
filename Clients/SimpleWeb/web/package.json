@@ -1,0 +1,50 @@
+{
+  "name": "simple-web",
+  "version": "0.0.1-developer",
+  "private": true,
+  "license": "SEE REPO",
+  "author": "Mitchell Robert<https://github.com/mrinc>",
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/vue3-essential",
+      "eslint:recommended"
+    ],
+    "parser": "vue-eslint-parser",
+    "rules": {
+      "vue/multi-word-component-names": 0
+    }
+  },
+  "browserslist": [
+    "> 10%",
+    "last 2 versions",
+    "not dead"
+  ],
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "^5.0.4",
+    "@vue/cli-plugin-eslint": "^5.0.4",
+    "@vue/cli-service": "^5.0.4",
+    "@vue/compiler-sfc": "^3.2.31",
+    "eslint": "^8.12.0",
+    "eslint-plugin-vue": "^8.5.0",
+    "vue-eslint-parser": "^8.3.0",
+    "vue-template-compiler": "^2.6.14"
+  },
+  "dependencies": {
+    "apexcharts": "^3.33.2",
+    "core-js": "^3.21.1",
+    "install": "^0.13.0",
+    "mitt": "^3.0.0",
+    "npm": "^8.5.5",
+    "vue": "^3.2.31",
+    "vue3-apexcharts": "^1.4.1"
+  }
+}
